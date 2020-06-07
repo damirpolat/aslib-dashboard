@@ -17,10 +17,11 @@ scenarioServer = function(input, output, session, source) {
   
   # dynamic UI for selecting scenarios
   output$scenario_loader = renderUI({
-    switch(source$scenario_type,
-           "ASlib" = textInput("scenario", label = h4(strong("Type ASlib scenario")),
+    ns = session$ns
+    switch(source$scenario_type(),
+           "ASlib" = textInput(ns("scenario"), label = h4(strong("Type ASlib scenario")),
                                placeholder = "ex. SAT11-INDU", value = "SAT11-INDU"),
-           "Custom" =  list(shinyDirButton("scenario_upload", label = "Upload scenario",
+           "Custom" =  list(shinyDirButton(ns("scenario_upload"), label = "Upload scenario",
                                            "Select directory with scenario"),
                             verbatimTextOutput("scenario_dir", placeholder = TRUE))
     )
@@ -59,5 +60,8 @@ scenarioSourceUI = function(id) {
 
 # server for scenario source selection
 scenarioSourceServer = function(input, output, session) {
-  return(reactive( input$scenario_type ))
+  return(
+    list(
+      scenario_type = reactive( input$scenario_type ))
+  )
 }
