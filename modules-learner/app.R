@@ -23,16 +23,19 @@ ui = fluidPage(
   fluidRow(
     column(2,
            uiOutput("scenario_loader"),
-           uiOutput("selector1_loader"),
-           uiOutput("selector2_loader"),
+           #verbatimTextOutput("dir", placeholder = TRUE),
+           textInput("selector1", label = h4(strong("Type learner name")),
+                     placeholder = "ex. Random Forest", value = "regr.featureless"),
+           textInput("selector2", label = h4(strong("Type learner name")),
+                     placeholder = "ex. Random Forest", value = "regr.featureless"),
            actionButton("run", "Run!")
     ), 
     column(1,
            selectInput("scenario_type", label = h5(strong("Scenario source")),
                        choices = c("ASlib", "Custom")),
-           selectInput("selector1_type", label = h5(strong("Selector source")),
+           selectInput("selector1_source", label = h5(strong("Selector source")),
                        choices = c("mlr/llama", "Custom")),
-           selectInput("selector2_type", label = h5(strong("Selector source")),
+           selectInput("selector2_source", label = h5(strong("Selector source")),
                        choices = c("mlr/llama", "Custom"))
     ),
     column(7, offset = 0, scatterD3Output("plot1")), 
@@ -60,7 +63,7 @@ server = function(input, output) {
            "ASlib" = textInput("scenario", label = h4(strong("Type ASlib scenario")),
                                placeholder = "ex. SAT11-INDU", value = "SAT11-INDU"),
            "Custom" =  list(shinyDirButton("scenario_upload", label = "Upload scenario",
-                                           "Select directory with scenario"),
+                                              "Select directory with scenario"),
                             verbatimTextOutput("scenario_dir", placeholder = TRUE))
     )
   })
@@ -84,27 +87,6 @@ server = function(input, output) {
                    file.path(home, paste(unlist(scenario_dir()$path[-1]), collapse = .Platform$file.sep))
                }
   )
-  
-  # dynamic UI for selecting selectors
-  output$selector1_loader = renderUI({
-    switch(input$selector1_type,
-           "mlr/llama" = textInput("selector1", label = h4(strong("Type learner name")),
-                                   placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector1_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
-    )
-  })
-  
-  # dynamic UI for selecting selectors
-  output$selector2_loader = renderUI({
-    switch(input$selector2_type,
-           "mlr/llama" = textInput("selector2", label = h4(strong("Type learner name")),
-                                   placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector2_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
-    )
-  })
-  
   
   lines = reactive({ default_lines })
   learner1 = eventReactive(input$run, {
