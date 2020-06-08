@@ -117,8 +117,8 @@ build_model = function(learner_name, data) {
 # wrapper for building/uploading model
 # need assert that loaded model has predictions
 create_model = function(type, learner_name, file_name, data) {
-  if(type == "mlr/aslib") {
-    model = build_model(type, learner_name, data)
+  if(type == "mlr/llama") {
+    model = build_model(learner_name, data)
   } else if(type == "Custom") {
     var_name = load(file_name) 
     model = get(var_name)

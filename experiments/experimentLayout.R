@@ -114,13 +114,17 @@ server = function(input, output) {
   
   # convert data into llama format
   scenario_data = reactive(get_data(load_scenario()))
-  get_ids = reactive(scenario_data()$data[scenario_data()$test[[1]], scenario_data()$ids])
+  get_ids = reactive(scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids])
+  
+  #global$selector1_file = 
   
   # create or read models
-  model1 = reactive(create_model(input$selector1_type(), input$selector1(), 
-                        input$selector1_file(), scenario_data()))
-  model2 = reactive(create_model(input$selector2_type(), input$selector2(), 
-                        input$selector2_file(), scenario_data()))
+  model1 = reactive(create_model(type = input$selector1_type, 
+                                 learner_name = input$selector1, 
+                                 file_name = input$selector1_file, 
+                                 data = scenario_data()))
+  model2 = reactive(create_model(input$selector2_type, input$selector2, 
+                        input$selector2_file, scenario_data()))
 
   
 
