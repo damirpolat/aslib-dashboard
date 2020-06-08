@@ -94,3 +94,40 @@ make_text = function(metric, selector1, selector2) {
     return(paste("PAR10 Scores for ", selector1, " vs. ", selector2))
   }
 }
+
+
+# build data from scenario
+get_data = function(scenario) {
+  llama.cv = convertToLlamaCVFolds(scenario)
+  data = fixFeckingPresolve(scenario, llama.cv)
+  return(data)
+}
+
+
+# build model with llama with scenario split into train/test
+build_model = function(learner_name, data) {
+  learner = makeImputeWrapper(learner = setHyperPars(makeLearner(learner_name)),
+                classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
+                factor = imputeConstant("NA"), character = imputeConstant("NA")))
+  model = regression(learner, data)
+  return(model)
+}
+
+
+# wrapper for building/uploading model
+# need assert that loaded model has predictions
+create_model = function(type, learner_name, file_name, data) {
+  if(type == "mlr/aslib") {
+    model = build_model(type, learner_name, data)
+  } else if(type == "Custom") {
+    var_name = load(file_name) 
+    model = get(var_name)
+  }
+  return(model)
+}
+
+
+# get model name
+get_selector_name = function(type, learner_name, file_name) {
+  return("name")
+}

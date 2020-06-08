@@ -46,7 +46,7 @@ ui = fluidPage(
 
 # Define server logic 
 server = function(input, output) {
-  
+  lines = reactive({ default_lines })
   shinyDirChoose(
     input,
     'scenario_upload',
@@ -106,7 +106,7 @@ server = function(input, output) {
   })
   
   
-  lines = reactive({ default_lines })
+  
   learner1 = eventReactive(input$run, {
     makeImputeWrapper(learner = setHyperPars(makeLearner(input$selector1)),
                       classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
