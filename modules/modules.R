@@ -7,7 +7,7 @@ scenarioInput = function(id) {
   list(uiOutput(ns("scenario_loader")))
 }
 
-scenarioServer = function(input, output, session, source) {
+scenarioServer = function(input, output, session, source, run) {
   shinyDirChoose(
     input,
     'scenario_upload',
@@ -15,9 +15,10 @@ scenarioServer = function(input, output, session, source) {
     filetypes = c('', 'txt', 'arff', 'csv')
   )
   
+  ns = session$ns
   # dynamic UI for selecting scenarios
   output$scenario_loader = renderUI({
-    ns = session$ns
+    #ns = session$ns
     switch(source$scenario_type(),
            "ASlib" = textInput(ns("scenario"), label = h4(strong("Type ASlib scenario")),
                                placeholder = "ex. SAT11-INDU", value = "SAT11-INDU"),
@@ -46,6 +47,13 @@ scenarioServer = function(input, output, session, source) {
                    file.path(home, paste(unlist(scenario_dir()$path[-1]), collapse = .Platform$file.sep))
                }
   )
+  
+  load_scenario = eventReactive(run(), {
+    read_scenario(input$scenario_type, global$datapath, input$scenario)
+  })
+  return(list(
+    load_scenario = load_scenario)
+  )
 }
 
 # scenario source selection UI
@@ -64,4 +72,15 @@ scenarioSourceServer = function(input, output, session) {
     list(
       scenario_type = reactive( input$scenario_type ))
   )
+}
+
+
+# module for testing outputs
+testUI = function(id) {
+  ns = NS(id)
+  list(textOutput("name"))
+}
+
+testServer = function(input, output, session, text) {
+  output$name = renderText(summary(text()))
 }

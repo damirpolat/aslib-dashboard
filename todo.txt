@@ -9,3 +9,7 @@ add colorblind friendly colors
 maybe even remove par10 scores
 bug with not updating title and text for plot
 add loading animations
+
+modules: module for selecting and loading scenarios; module for selecting learners; module for visualizing that takes outputs 
+of both learner and scenario modules.
+Maybe combine scenarioSource module with scenario module. 
