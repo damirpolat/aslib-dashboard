@@ -35,7 +35,8 @@ ui = fluidPage(
            selectInput("selector2_type", label = h5(strong("Selector source")),
                        choices = c("mlr/llama", "Custom"))
     ),
-    column(7, offset = 0, scatterD3Output("plot1")), 
+    column(7, offset = 0, verbatimTextOutput("out")),
+    #column(7, offset = 0, scatterD3Output("plot1")), 
     column(2,
            selectInput("metric", "Select metric", choices = c("mcp", "par10")),
            tableOutput("summary")
@@ -116,15 +117,42 @@ server = function(input, output) {
   scenario_data = reactive(get_data(load_scenario()))
   get_ids = reactive(scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids])
   
-  #global$selector1_file = 
+  # handle file path
+  global$selector1_file = getwd()
+  file1 = reactive(input$selector1_file)
+  observeEvent(ignoreNULL = TRUE,
+       eventExpr = {
+         input$selector1_file
+       },
+       handlerExpr = {
+         global$selector1_file = file1()
+       }
+  )
+  
+  output$out = reactive(global$selector1_file)
+  file2 = reactive(input$selector2_file)
+  # handle file path
+  global$selector2_file = getwd()
+  observeEvent(ignoreNULL = TRUE,
+               eventExpr = {
+                 input$selector2_file
+               },
+               handlerExpr = {
+                 global$selector2_file = file2()
+               }
+  )
   
   # create or read models
   model1 = reactive(create_model(type = input$selector1_type, 
                                  learner_name = input$selector1, 
-                                 file_name = input$selector1_file, 
+                                 #file_name = NULL,
+                                 file_name = global$selector1_file, 
                                  data = scenario_data()))
-  model2 = reactive(create_model(input$selector2_type, input$selector2, 
-                        input$selector2_file, scenario_data()))
+  model2 = reactive(create_model(type = input$selector2_type, 
+                                 learner_name = input$selector2, 
+                                 #file_name = NULL,
+                                 file_name = global$selector2_file,
+                                 data = scenario_data()))
 
   
 
