@@ -112,13 +112,24 @@ server = function(input, output) {
   learner2 = eventReactive(input$run, {
                 input$selector2
               })
-  file1 = eventReactive(input$run, {
-                input$selector1_upload
-              })
-  file2 = eventReactive(input$run, {
-                input$selector_upload
-  })
   
+  global$file1 = NULL
+  global$file1 = NULL
+  observeEvent(ignoreNULL = TRUE,
+               eventExpr = {
+                 input$run
+               },
+               handlerExpr = {
+                 global$file1 = reactive(input$selector1_upload)
+               })
+  
+  observeEvent(ignoreNULL = TRUE,
+               eventExpr = {
+                 input$run
+               },
+               handlerExpr = {
+                 global$file2 = reactive(input$selector2_upload)
+               })
 
   
   
@@ -174,16 +185,29 @@ server = function(input, output) {
   temp_vals = reactiveValues()
   observe({
     # create or read models
-    temp_vals$selector1 = create_model(type = input$selector1_type, 
-                                   learner_name = learner1(), 
-                                   #file_name = NULL,
-                                   file_name = file2,
-                                   data = scenario_data())
-    temp_vals$selector2 = create_model(type = input$selector2_type, 
-                                   learner_name = learner2(), 
-                                   #file_name = NULL,
-                                   file_name = file1,
-                                   data = scenario_data())
+    if(!is.null(global$file1) && input$selector1_type == "Custom") {
+      temp_vals$selector1 = create_model(type = input$selector1_type, 
+                                         learner_name = NULL, 
+                                         file_name = global$file1,
+                                         data = scenario_data())
+    } else if(input$selector1_type == "mlr/llama") {
+      temp_vals$selector1 = create_model(type = input$selector1_type, 
+                                         learner_name = learner1(), 
+                                         file_name = NULL,
+                                         data = scenario_data())
+    }
+    
+    if(!is.null(global$file2) && input$selector2_type == "Custom") {
+      temp_vals$selector2 = create_model(type = input$selector2_type, 
+                                         learner_name = NULL, 
+                                         file_name = global$file2,
+                                         data = scenario_data())
+    } else if(input$selector2_type == "mlr/llama") {
+      temp_vals$selector2 = create_model(type = input$selector2_type, 
+                                         learner_name = learner2(), 
+                                         file_name = NULL,
+                                         data = scenario_data())
+    }
     
     
     #temp_vals$selector1 = regression(learner1(), scenario_data())
