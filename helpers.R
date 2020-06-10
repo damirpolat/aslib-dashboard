@@ -120,8 +120,10 @@ create_model = function(type, learner_name, file_name, data) {
   if(type == "mlr/llama") {
     model = build_model(learner_name, data)
   } else if(type == "Custom") {
-    var_name = load(file_name) 
+    print(file_name$datapath)
+    var_name = load(file_name$datapath) 
     model = get(var_name)
+    print(model)
   }
   return(model)
 }
