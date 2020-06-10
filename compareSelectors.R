@@ -206,7 +206,7 @@ server = function(input, output) {
       #temp_vals$summary = temp_vals$tmp
       #temp_vals$summary[, input$selector1] = model1_mcp()
     } else if (input$metric == "par10") {
-      temp_vals$summary = data.frame("x" = model1_gap_par(), "y" = model1_gap_par())
+      temp_vals$summary = data.frame("x" = model1_gap_par(), "y" = model2_gap_par())
     }
     
   })
@@ -220,13 +220,32 @@ server = function(input, output) {
   tooltip = reactive(paste("instance_id = ", data()$instance_id, "<br>x = ", 
                            data()$x, "<br>y = ", data()$y))
   
-  make_par_title = reactive( paste("PAR10 Scores for ", input$selector1, " vs. ", input$selector2) )
+  # make names for selectors
+  selector1_name = eventReactive(input$run, {
+    if(input$selector1_type == "mlr/aslib") {
+      input$selector1
+    } else if(input$selector1_type == "Custom" && !is.null(file1())) {
+      file1()$name
+    }
+  })
+  
+  selector2_name = reactive({
+    if(input$selector2_type == "mlr/aslib") {
+      input$selector2
+    } else if(input$selector2_type == "Custom" && !is.null(file2())) {
+      file2()$name
+    }
+  })
+  
+  make_par_title = reactive({
+    paste("PAR10 Scores for ", selector1_name(), " vs. ", selector2_name())
+  })
   
   plot.text = reactive({
     if(input$metric == "mcp") {
-      paste("Misclassification Penalties for ", input$selector1, " vs. ", input$selector2)
+      paste("Misclassification Penalties for ", selector1_name(), " vs. ", selector2_name())
     } else if (input$metric == "par10") {
-      paste("PAR10 Scores for ", input$selector1, " vs. ", input$selector2)
+      paste("PAR10 Scores for ", selector1_name(), " vs. ", selector2_name())
     }
   })
   
@@ -242,7 +261,7 @@ server = function(input, output) {
   output$plot1 = renderScatterD3({
     scatterD3(data = data(), x = x, y = y, tooltip_text = tooltip(),
               tooltip_position = "top right",
-              xlab = input$selector1, ylab = input$selector2,
+              xlab = selector1_name(), ylab = selector1_name(),
               point_size = 100, point_opacity = 0.5,
               hover_size = 3, hover_opacity = 1,
               color = "purple",
