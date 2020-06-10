@@ -36,8 +36,7 @@ build_data = function(ids, penalties1 = NULL, penalties2 = NULL, par1 = NULL, pa
 }
 
 # compute mean mcp or gap closed
-compute_metric = function(scenario, llama.cv, choice, method) {
-  data = fixFeckingPresolve(scenario, llama.cv)
+compute_metric = function(data, choice, method) {
   
   if(method == "mcp") {
     if(choice == "sbs") {
@@ -80,7 +79,8 @@ compute_gap =  function(model_val, vbs_val, sbs_val) {
 # wrapper for loading scenario
 read_scenario = function(switch, path = NULL, scenario_name = NULL) {
   if(switch == "ASlib") {
-    return(getCosealASScenario(scenario_name))
+    scenario = getCosealASScenario(scenario_name)
+    return(scenario)
   } else if (switch == "Custom") {
     return(parseASScenario(path))
   }
