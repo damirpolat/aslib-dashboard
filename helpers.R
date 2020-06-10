@@ -82,6 +82,7 @@ read_scenario = function(switch, path = NULL, scenario_name = NULL) {
     scenario = getCosealASScenario(scenario_name)
     return(scenario)
   } else if (switch == "Custom") {
+    print("parsing scenario")
     return(parseASScenario(path))
   }
 }
