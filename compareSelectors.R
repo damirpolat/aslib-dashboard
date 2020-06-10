@@ -105,19 +105,22 @@ server = function(input, output) {
     )
   })
   
-  
-  
+  # get names of learners
   learner1 = eventReactive(input$run, {
-    makeImputeWrapper(learner = setHyperPars(makeLearner(input$selector1)),
-                      classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
-                                     factor = imputeConstant("NA"), character = imputeConstant("NA")))
+                input$selector1
+              })
+  learner2 = eventReactive(input$run, {
+                input$selector2
+              })
+  file1 = eventReactive(input$run, {
+                input$selector1_upload
+              })
+  file2 = eventReactive(input$run, {
+                input$selector_upload
   })
   
-  learner2 = eventReactive(input$run, {
-    makeImputeWrapper(learner = setHyperPars(makeLearner(input$selector2)),
-                      classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
-                                     factor = imputeConstant("NA"), character = imputeConstant("NA")))
-  })
+
+  
   
   # function to load ASlib scenario
   load_scenario = eventReactive(input$run, {
@@ -125,14 +128,14 @@ server = function(input, output) {
   })
   
   # convert data into llama format
-  get_data = reactive(trainTest(convertToLlama(load_scenario())))
-  get_ids = reactive(get_data()$data[get_data()$test[[1]], get_data()$ids])
+  scenario_data = reactive(get_data(load_scenario()))
+  get_ids = reactive(scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids]) 
   
   # compute metrics of interest
-  penalties1 = reactive(misclassificationPenalties(get_data(), temp_vals$selector1))
-  penalties2 = reactive(misclassificationPenalties(get_data(), temp_vals$selector2))
-  par1 = reactive(parscores(get_data(), temp_vals$selector1))
-  par2 = reactive(parscores(get_data(), temp_vals$selector2))
+  penalties1 = reactive(misclassificationPenalties(scenario_data(), temp_vals$selector1))
+  penalties2 = reactive(misclassificationPenalties(scenario_data(), temp_vals$selector2))
+  par1 = reactive(parscores(scenario_data(), temp_vals$selector1))
+  par2 = reactive(parscores(scenario_data(), temp_vals$selector2))
   
   build_mcp = reactive(build_data(get_ids(), penalties1(), penalties2(), par1 = NULL, par2 = NULL))
   build_par = reactive(build_data(get_ids(), penalties1 = NULL, penalties2 = NULL, par1(), par2()))
@@ -146,17 +149,17 @@ server = function(input, output) {
   )
   
   # compute mean mcp for each model
-  single_mcp = reactive(compute_metric(load_scenario(), get_data(), choice = "sbs", 
+  single_mcp = reactive(compute_metric(scenario_data(), choice = "sbs", 
                                        method = "mcp"))
-  virtual_mcp = reactive(compute_metric(load_scenario(), get_data(), choice = "vbs", 
+  virtual_mcp = reactive(compute_metric(scenario_data(), choice = "vbs", 
                                         method = "mcp"))
   model1_mcp = reactive(mean(penalties1()))
   model2_mcp = reactive(mean(penalties2()))
   
   # compute mean par10 for each model
-  single_par = reactive(compute_metric(load_scenario(), get_data(), choice = "sbs", 
+  single_par = reactive(compute_metric(scenario_data(), choice = "sbs", 
                                        method = "par10"))
-  virtual_par = reactive(compute_metric(load_scenario(), get_data(), choice = "vbs", 
+  virtual_par = reactive(compute_metric(scenario_data(), choice = "vbs", 
                                         method = "par10"))
   model1_par = reactive(mean(par1()))
   model2_par = reactive(mean(par2()))
@@ -170,8 +173,21 @@ server = function(input, output) {
   # might need to rewrite this
   temp_vals = reactiveValues()
   observe({
-    temp_vals$selector1 = regression(learner1(), get_data())
-    temp_vals$selector2 = regression(learner2(), get_data())
+    # create or read models
+    temp_vals$selector1 = create_model(type = input$selector1_type, 
+                                   learner_name = learner1(), 
+                                   #file_name = NULL,
+                                   file_name = file2,
+                                   data = scenario_data())
+    temp_vals$selector2 = create_model(type = input$selector2_type, 
+                                   learner_name = learner2(), 
+                                   #file_name = NULL,
+                                   file_name = file1,
+                                   data = scenario_data())
+    
+    
+    #temp_vals$selector1 = regression(learner1(), scenario_data())
+    #temp_vals$selector2 = regression(learner2(), scenario_data())
     
     if(input$metric == "mcp") {
       temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
