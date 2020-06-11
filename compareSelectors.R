@@ -201,10 +201,6 @@ server = function(input, output) {
     
     if(input$metric == "mcp") {
       temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
-      #row.names(temp_vals$summary) = "Percentage Gap Closed"
-      #colnames(temp_vals$summary) = c("sbs", "vbs", paste(input$selector1), paste(input$selector2))
-      #temp_vals$summary = temp_vals$tmp
-      #temp_vals$summary[, input$selector1] = model1_mcp()
     } else if (input$metric == "par10") {
       temp_vals$summary = data.frame("x" = model1_gap_par(), "y" = model2_gap_par())
     }
@@ -222,15 +218,15 @@ server = function(input, output) {
   
   # make names for selectors
   selector1_name = eventReactive(input$run, {
-    if(input$selector1_type == "mlr/aslib") {
+    if(input$selector1_type == "mlr/llama") {
       input$selector1
     } else if(input$selector1_type == "Custom" && !is.null(file1())) {
       file1()$name
     }
   })
   
-  selector2_name = reactive({
-    if(input$selector2_type == "mlr/aslib") {
+  selector2_name = eventReactive(input$run, {
+    if(input$selector2_type == "mlr/llama") {
       input$selector2
     } else if(input$selector2_type == "Custom" && !is.null(file2())) {
       file2()$name
@@ -261,7 +257,7 @@ server = function(input, output) {
   output$plot1 = renderScatterD3({
     scatterD3(data = data(), x = x, y = y, tooltip_text = tooltip(),
               tooltip_position = "top right",
-              xlab = selector1_name(), ylab = selector1_name(),
+              xlab = selector1_name(), ylab = selector2_name(),
               point_size = 100, point_opacity = 0.5,
               hover_size = 3, hover_opacity = 1,
               color = "purple",
