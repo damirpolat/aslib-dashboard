@@ -37,16 +37,15 @@ build_data = function(ids, penalties1 = NULL, penalties2 = NULL, par1 = NULL, pa
 
 # compute mean mcp or gap closed
 compute_metric = function(data, choice, method) {
-  
   if(method == "mcp") {
     if(choice == "sbs") {
-      single = llama:::singleBest(llama.cv)
+      single = llama:::singleBest(data)
       single = list(predictions = single)
       attr(single, "hasPredictions") = TRUE
       
       val = mean(misclassificationPenalties(data, single))
     } else if(choice == "vbs") {
-      vbs = llama:::vbs(llama.cv)
+      vbs = llama:::vbs(data)
       vbs = list(predictions = vbs)
       attr(vbs, "hasPredictions") = TRUE
       
@@ -54,13 +53,13 @@ compute_metric = function(data, choice, method) {
     } 
   } else if(method == "par10") {
     if(choice == "sbs") {
-      single = llama:::singleBest(llama.cv)
+      single = llama:::singleBest(data)
       single = list(predictions = single)
       attr(single, "hasPredictions") = TRUE
       
       val = mean(parscores(data, single))
     } else if(choice == "vbs") {
-      vbs = llama:::vbs(llama.cv)
+      vbs = llama:::vbs(data)
       vbs = list(predictions = vbs)
       attr(vbs, "hasPredictions") = TRUE
       
@@ -82,8 +81,8 @@ read_scenario = function(switch, path = NULL, scenario_name = NULL) {
     scenario = getCosealASScenario(scenario_name)
     return(scenario)
   } else if (switch == "Custom") {
-    print("parsing scenario")
-    return(parseASScenario(path))
+    scenario = parseASScenario(path)
+    return(scenario)
   }
 }
 
