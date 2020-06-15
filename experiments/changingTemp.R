@@ -6,10 +6,9 @@ library(shiny)
 library(mlr)
 library(llama)
 library(aslib)
-library(purrr)
 library(scatterD3)
 library(shinyFiles)
-source("./helpers.R")
+source("../helpers.R")
 
 set.seed(1L)
 
@@ -24,17 +23,15 @@ ui = fluidPage(
   fluidRow(
     column(2,
            uiOutput("scenario_loader"),
-           uiOutput("selector1_loader"),
-           uiOutput("selector2_loader"),
+           fileInput("selector1_upload", label = "Upload selector results",
+                                      accept = c(".RData", ".rds")),
+           fileInput("selector2_upload", label = "Upload selector results",
+                     accept = c(".RData", ".rds")),
            actionButton("run", "Run!")
     ), 
     column(1,
            selectInput("scenario_type", label = h5(strong("Scenario source")),
-                       choices = c("ASlib", "Custom")),
-           selectInput("selector1_type", label = h5(strong("Selector source")),
-                       choices = c("mlr/llama", "Custom")),
-           selectInput("selector2_type", label = h5(strong("Selector source")),
-                       choices = c("mlr/llama", "Custom"))
+                       choices = c("ASlib", "Custom"))
     ),
     column(7, offset = 0, scatterD3Output("plot1")), 
     column(2,
@@ -86,57 +83,51 @@ server = function(input, output) {
                }
   )
   
-  # dynamic UI for selecting selectors
-  output$selector1_loader = renderUI({
-    switch(input$selector1_type,
-           "mlr/llama" = textInput("selector1", label = h4(strong("Type learner name")),
-                                   placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector1_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
-    )
-  })
   
-  # dynamic UI for selecting selectors
-  output$selector2_loader = renderUI({
-    switch(input$selector2_type,
-           "mlr/llama" = textInput("selector2", label = h4(strong("Type learner name")),
-                                   placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector2_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
-    )
-  })
-  
-  # get names of learners
-  learner1 = eventReactive(input$run, {
-                input$selector1
-              })
-  learner2 = eventReactive(input$run, {
-                input$selector2
-              })
-  
-
   file1 = eventReactive(input$run, {
-              input$selector1_upload
+    req(input$selector1_upload)
+    input$selector1_upload
   })
   file2 = eventReactive(input$run, {
-              input$selector2_upload
+    req(input$selector2_upload)
+    input$selector2_upload
+  })
+  
+  selector1 = reactive({
+    req(input$selector1_upload)
+    create_model(type = "Custom", 
+                 learner_name = NULL, 
+                 file_name = input$selector1_upload,
+                 data = scenario_data())
+  })
+  
+  selector2 = reactive({
+    req(input$selector2_upload)
+    create_model(type = "Custom", 
+                 learner_name = NULL, 
+                 file_name = input$selector2_upload,
+                 data = scenario_data())
   })
   
   
   # function to load ASlib scenario
-  load_scenario = eventReactive(input$run, {
-    read_scenario(input$scenario_type, global$datapath, input$scenario)
+  scenario_data = eventReactive(input$run, {
+    get_data(read_scenario(input$scenario_type, global$datapath, input$scenario))
   })
   
   # convert data into llama format
-  scenario_data = reactive(get_data(load_scenario()))
+  #scenario_data = reactive(get_data(load_scenario()))
   get_ids = reactive(scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids]) 
   
   # compute metrics of interest
-  penalties1 = reactive(misclassificationPenalties(scenario_data(), temp_vals$selector1))
-  penalties2 = reactive(misclassificationPenalties(scenario_data(), temp_vals$selector2))
-  par1 = reactive(parscores(scenario_data(), temp_vals$selector1))
-  par2 = reactive(parscores(scenario_data(), temp_vals$selector2))
+  penalties1 = reactive({
+    #req(input$)
+    misclassificationPenalties(scenario_data(), selector1())
+  })
+  
+  penalties2 = reactive(misclassificationPenalties(scenario_data(), selector2()))
+  par1 = reactive(parscores(scenario_data(), selector1()))
+  par2 = reactive(parscores(scenario_data(), selector2()))
   
   build_mcp = reactive(build_data(get_ids(), penalties1(), penalties2(), par1 = NULL, par2 = NULL))
   build_par = reactive(build_data(get_ids(), penalties1 = NULL, penalties2 = NULL, par1(), par2()))
@@ -174,31 +165,7 @@ server = function(input, output) {
   # might need to rewrite this
   temp_vals = reactiveValues()
   observe({
-    # create or read models
-    if(!is.null(file1()) && input$selector1_type == "Custom") {
-      temp_vals$selector1 = create_model(type = "Custom", 
-                                         learner_name = NULL, 
-                                         file_name = file1(),
-                                         data = scenario_data())
-    } else if(input$selector1_type == "mlr/llama") {
-      temp_vals$selector1 = create_model(type = "mlr/llama", 
-                                         learner_name = learner1(), 
-                                         file_name = NULL,
-                                         data = scenario_data())
-    }
-    
-    if(!is.null(file2()) && input$selector2_type == "Custom") {
-      temp_vals$selector2 = create_model(type = input$selector2_type, 
-                                         learner_name = NULL, 
-                                         file_name = file2(),
-                                         data = scenario_data())
-    } else if(input$selector2_type == "mlr/llama") {
-      temp_vals$selector2 = create_model(type = input$selector2_type, 
-                                         learner_name = learner2(), 
-                                         file_name = NULL,
-                                         data = scenario_data())
-    }
-    
+
     
     if(input$metric == "mcp") {
       temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
@@ -219,19 +186,11 @@ server = function(input, output) {
   
   # make names for selectors
   selector1_name = eventReactive(input$run, {
-    if(input$selector1_type == "mlr/llama") {
-      input$selector1
-    } else if(input$selector1_type == "Custom" && !is.null(file1())) {
       file1()$name
-    }
   })
   
   selector2_name = eventReactive(input$run, {
-    if(input$selector2_type == "mlr/llama") {
-      input$selector2
-    } else if(input$selector2_type == "Custom" && !is.null(file2())) {
       file2()$name
-    }
   })
   
   make_par_title = reactive({
