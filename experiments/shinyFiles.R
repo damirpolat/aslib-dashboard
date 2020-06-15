@@ -1,6 +1,6 @@
 # compareSelectors.R
 # Damir Pulatov
-options(shiny.maxRequestSize=100*1024^2)
+options(shiny.maxRequestSize = 30*1024^2)
 
 library(shiny)
 library(mlr)
@@ -91,8 +91,9 @@ server = function(input, output) {
     switch(input$selector1_type,
            "mlr/llama" = textInput("selector1", label = h4(strong("Type learner name")),
                                    placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector1_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
+           "custom" = shinyFilesButton("selector1_upload", "Upload selector results" ,
+                                       title = "Please select a file:", multiple = FALSE,
+                                       buttonType = "default", class = NULL)
     )
   })
   
@@ -101,25 +102,40 @@ server = function(input, output) {
     switch(input$selector2_type,
            "mlr/llama" = textInput("selector2", label = h4(strong("Type learner name")),
                                    placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector2_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
+           "custom" = shinyFilesButton("selector2_upload", "Upload selector results" ,
+                            title = "Please select a file:", multiple = FALSE,
+                            buttonType = "default", class = NULL)
     )
+  })
+  
+  # values for selector files
+  volumes =  getVolumes()
+  v = reactiveValues(path = NULL)
+  observe({
+    shinyFileChoose(input, "selector1_upload", roots = volumes, session = session)
+    
+    if (!is.null(input$selector1_upload)) {
+      file_selected = parseFilePaths(volumes, input$selector1_upload)
+      v$path1 = as.character(file_selected$datapath)
+      req(v$path1)
+      #v$data = read.csv(v$path)
+    }
   })
   
   # get names of learners
   learner1 = eventReactive(input$run, {
-                input$selector1
-              })
+    input$selector1
+  })
   learner2 = eventReactive(input$run, {
-                input$selector2
-              })
+    input$selector2
+  })
   
-
+  
   file1 = eventReactive(input$run, {
-              input$selector1_upload
+    input$selector1_upload
   })
   file2 = eventReactive(input$run, {
-              input$selector2_upload
+    input$selector2_upload
   })
   
   
@@ -175,9 +191,9 @@ server = function(input, output) {
   temp_vals = reactiveValues()
   observe({
     # create or read models
-    if(!is.null(file1()) && input$selector1_type == "Custom") {
-      temp_vals$selector1 = create_model(type = "Custom", 
-                                         learner_name = NULL, 
+    if(!is.null(file1()) && input$selector1_type == "custom") {
+      temp_vals$selector1 = create_model(type = "custom", 
+                                         learner_name = learner1(), 
                                          file_name = file1(),
                                          data = scenario_data())
     } else if(input$selector1_type == "mlr/llama") {
@@ -187,7 +203,7 @@ server = function(input, output) {
                                          data = scenario_data())
     }
     
-    if(!is.null(file2()) && input$selector2_type == "Custom") {
+    if(!is.null(file2()) && input$selector2_type == "custom") {
       temp_vals$selector2 = create_model(type = input$selector2_type, 
                                          learner_name = NULL, 
                                          file_name = file2(),

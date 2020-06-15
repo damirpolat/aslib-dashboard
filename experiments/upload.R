@@ -1,38 +1,46 @@
-## Only run examples in interactive R sessions
+library(shiny)
+library(shinyFiles)
 
+ui <- fluidPage(
+  shinyFilesButton("GetFile", "Choose a file" ,
+                   title = "Please select a file:", multiple = FALSE,
+                   buttonType = "default", class = NULL),
   
-  ui <- fluidPage(
-    sidebarLayout(
-      sidebarPanel(
-        fileInput("file1", "Choose CSV File",
-                  accept = c(
-                    "text/csv",
-                    "text/comma-separated-values,text/plain",
-                    ".csv")
-        ),
-        tags$hr(),
-        checkboxInput("header", "Header", TRUE)
-      ),
-      mainPanel(
-        tableOutput("contents")
-      )
-    )
-  )
+  actionButton(inputId = "reload", label = "Reload data"),
   
-  server <- function(input, output) {
-    output$contents <- renderTable({
-      # input$file1 will be NULL initially. After the user selects
-      # and uploads a file, it will be a data frame with 'name',
-      # 'size', 'type', and 'datapath' columns. The 'datapath'
-      # column will contain the local filenames where the data can
-      # be found.
-      inFile <- input$file1
-      
-      if (is.null(inFile))
-        return(NULL)
-      
-      read.csv(inFile$datapath, header = input$header)
-    })
-  }
+  tableOutput("test")     
+)
+
+
+server <- function(input,output,session){
   
-  shinyApp(ui, server)
+  volumes <- getVolumes()
+  
+  v = reactiveValues(path = NULL)
+  
+  observe({
+    shinyFileChoose(input, "GetFile", roots = volumes, session = session)
+    
+    if (!is.null(input$GetFile)) {
+      file_selected <- parseFilePaths(volumes, input$GetFile)
+      v$path <- as.character(file_selected$datapath)
+      req(v$path)
+      v$data <- read.csv(v$path)
+    }
+  })
+  
+  observeEvent(input$reload, {
+    req(v$path)
+    v$data <- read.csv(v$path)
+    
+  })
+  
+  output$test <- renderTable({
+    print(v$path)
+    if (is.null(v$data)) return()
+    v$data
+  })
+  
+}
+
+shinyApp(ui = ui, server = server)
