@@ -3,10 +3,8 @@
 options(shiny.maxRequestSize=100*1024^2)
 
 library(shiny)
-library(mlr)
 library(llama)
 library(aslib)
-library(purrr)
 library(scatterD3)
 library(shinyFiles)
 source("./helpers.R")
@@ -152,22 +150,22 @@ server = function(input, output) {
     temp_vals$selector1 = create_model(file_name = file1())
     temp_vals$selector2 = create_model(file_name = file2())
     
-    if(input$metric == "mcp") {
-      temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
-    } else if (input$metric == "par10") {
-      temp_vals$summary = data.frame("x" = model1_gap_par(), "y" = model2_gap_par())
-    }
+    #if(input$metric == "mcp") {
+    #  temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
+    #} else if (input$metric == "par10") {
+    #  temp_vals$summary = data.frame("x" = model1_gap_par(), "y" = model2_gap_par())
+    #}
     
   })
   
   # build summary for mcp
-  output$summary = renderTable({
-    temp_vals$summary
-  }, include.rownames = FALSE)
+  #output$summary = renderTable({
+  #  temp_vals$summary
+  #}, include.rownames = FALSE)
   
   
-  tooltip = reactive(paste("instance_id = ", data()$instance_id, "<br>x = ", 
-                           data()$x, "<br>y = ", data()$y))
+  #tooltip = reactive(paste("instance_id = ", data()$instance_id, "<br>x = ", 
+  #                         data()$x, "<br>y = ", data()$y))
   
   # make names for selectors
   selector1_name = eventReactive(input$run, {
@@ -198,9 +196,10 @@ server = function(input, output) {
     }
   )
   
+  #test_data = reactive(mtcars)
   # make scatterplot with misclassification penalties
   output$plot1 = renderScatterD3({
-    scatterD3(data = data(), x = x, y = y, tooltip_text = tooltip(),
+    scatterD3(data = data(), x = x, y = y, #tooltip_text = tooltip(),
               tooltip_position = "top right",
               xlab = selector1_name(), ylab = selector2_name(),
               point_size = 100, point_opacity = 0.5,
