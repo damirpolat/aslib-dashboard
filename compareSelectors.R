@@ -210,32 +210,6 @@ server = function(input, output) {
   # might need to rewrite this
   temp_vals = reactiveValues()
   observe({
-    # create or read models
-    if(!is.null(file1()) && input$selector1_type == "Custom") {
-      temp_vals$selector1 = create_model(type = "Custom", 
-                                         learner_name = NULL, 
-                                         file_name = file1(),
-                                         data = scenario_data())
-    } else if(input$selector1_type == "mlr/llama") {
-      temp_vals$selector1 = create_model(type = "mlr/llama", 
-                                         learner_name = learner1(), 
-                                         file_name = NULL,
-                                         data = scenario_data())
-    }
-    
-    if(!is.null(file2()) && input$selector2_type == "Custom") {
-      temp_vals$selector2 = create_model(type = input$selector2_type, 
-                                         learner_name = NULL, 
-                                         file_name = file2(),
-                                         data = scenario_data())
-    } else if(input$selector2_type == "mlr/llama") {
-      temp_vals$selector2 = create_model(type = input$selector2_type, 
-                                         learner_name = learner2(), 
-                                         file_name = NULL,
-                                         data = scenario_data())
-    }
-    
-    
     if(input$metric == "mcp") {
       temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
     } else if (input$metric == "par10") {
