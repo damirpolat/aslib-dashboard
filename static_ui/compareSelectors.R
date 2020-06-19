@@ -101,14 +101,21 @@ server = function(input, output) {
   })
   
   # convert data into llama format
-  #scenario_data = reactive(get_data(load_scenario()))
-  get_ids = reactive(scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids]) 
+  get_ids = reactive({
+    req(scenario_data())
+    scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids]
+  })
+  
+  
+  selector1 = reactive(create_model(file_name = file1()))
+  selector2 = reactive(create_model(file_name = file2()))
+  
   
   # compute metrics of interest
-  penalties1 = reactive(misclassificationPenalties(scenario_data(), temp_vals$selector1))
-  penalties2 = reactive(misclassificationPenalties(scenario_data(), temp_vals$selector2))
-  par1 = reactive(parscores(scenario_data(), temp_vals$selector1))
-  par2 = reactive(parscores(scenario_data(), temp_vals$selector2))
+  penalties1 = reactive(misclassificationPenalties(scenario_data(), selector1()))
+  penalties2 = reactive(misclassificationPenalties(scenario_data(), selector2()))
+  par1 = reactive(parscores(scenario_data(), selector1()))
+  par2 = reactive(parscores(scenario_data(), selector2()))
   
   build_mcp = reactive(build_data(get_ids(), penalties1(), penalties2()))
   build_par = reactive(build_data(get_ids(), par1(), par2()))
@@ -144,11 +151,11 @@ server = function(input, output) {
   model2_gap_par = reactive(compute_gap(model2_par(), virtual_par(), single_par()))
   
   # might need to rewrite this
-  temp_vals = reactiveValues()
+  temp_vls = reactiveValues()
   observe({
     # create or read models
-    temp_vals$selector1 = create_model(file_name = file1())
-    temp_vals$selector2 = create_model(file_name = file2())
+    #temp_vals$selector1 = create_model(file_name = file1())
+    #temp_vals$selector2 = create_model(file_name = file2())
     
     #if(input$metric == "mcp") {
     #  temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
