@@ -4,19 +4,11 @@
 library(llama)
 
 # build data for scatter plot
-build_data = function(ids, penalties1 = NULL, penalties2 = NULL, par1 = NULL, par2 = NULL) {
-  # data for mcp 
-  if(!is.null(penalties1) && !is.null(penalties2)) {
-    data = data.frame(instance_id = ids, x = penalties1, y = penalties2, method = "mcp")
-  } 
-  
-  # data for par10
-  if (!is.null(par1) && !is.null(par2)) {
-    data = data.frame(instance_id = ids, x = par1, y = par2, method = "par10")
-  }
-  
+build_data = function(ids, m1, m2) {
+  data = data.frame(instance_id = ids, x = m1, y = m2)
   return(data)
 }
+
 
 # compute mean mcp or gap closed
 compute_metric = function(data, choice, method) {
@@ -57,34 +49,18 @@ compute_gap =  function(model_val, vbs_val, sbs_val) {
   return(round(1 - (model_val - vbs_val) / (sbs_val - vbs_val), 2))
 }
 
+
 # wrapper for loading scenario
 read_scenario = function(switch, path = NULL, scenario_name = NULL) {
   if(switch == "ASlib") {
     scenario = getCosealASScenario(scenario_name)
-    cat(scenario_name)
     return(scenario)
   } else if (switch == "Custom") {
     scenario = parseASScenario(path)
     return(scenario)
   }
-  #return(scenario)
 }
 
-
-# wrapper for loading scenario
-read_scenario1 = function(scenario_name) {
-  scenario = getCosealASScenario(scenario_name)
-  #cat(scenario_name)
-  return(scenario)
-}
-
-read_data = function(scenario_name) {
-  scenario = getCosealASScenario(scenario_name)
-  llama.cv = convertToLlamaCVFolds(scenario)
-  data = fixFeckingPresolve(scenario, llama.cv)
-  cat("reading")
-  return(data)
-}
 
 # make plot text
 make_text = function(metric, selector1, selector2) {
@@ -98,13 +74,6 @@ make_text = function(metric, selector1, selector2) {
 
 # build data from scenario
 get_data = function(scenario) {
-  llama.cv = convertToLlamaCVFolds(scenario)
-  data = fixFeckingPresolve(scenario, llama.cv)
-  return(data)
-}
-
-# build data from scenario
-get_data2 = function(scenario) {
   llama.cv = convertToLlamaCVFolds(scenario)
   data = fixFeckingPresolve(scenario, llama.cv)
   return(data)
@@ -130,12 +99,6 @@ create_model = function(type, learner_name, file_name, data) {
     var_name = load(file_name$datapath) 
     model = get(var_name)
   }
-  return(model)
-}
-
-create_model1 = function(file_name) {
-  var_name = load(file_name$datapath) 
-  model = get(var_name)
   return(model)
 }
 
