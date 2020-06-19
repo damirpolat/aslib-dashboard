@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     libxt-dev \
     libssl-dev \
     libssh2-1-dev \ 
+		tzdata \
 		gdebi-core \
 		subversion \
 		default-jdk \
@@ -30,10 +31,12 @@ RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION 
 # install R packages
 RUN R -e "install.packages('shinyFiles')"
 RUN R -e "install.packages('rJava')"
-RUN R -e "install.packages('RWeka')"
-RUN R -e "install.packages('aslib')"
 RUN R -e "install.packages('devtools')"
 RUN R -e "devtools::install_github('https://github.com/juba/scatterD3')"
+
+# get aslib-r package from GitHub
+RUN git clone --single-branch --branch farff-master https://github.com/damirpolat/aslib-r.git home/aslib-r
+RUN R -e "devtools::install_local('./home/aslib-r/aslib')"
 
 # copy app files to image
 COPY shiny-server.sh /usr/bin/shiny-server.sh
