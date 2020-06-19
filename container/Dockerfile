@@ -35,7 +35,7 @@ RUN R -e "install.packages('devtools')"
 RUN R -e "devtools::install_github('https://github.com/juba/scatterD3')"
 
 # get aslib-r package from GitHub
-RUN git clone --single-branch --branch farff-master https://github.com/damirpolat/aslib-r.git home/aslib-r
+RUN git clone --single-branch --branch farff https://github.com/damirpolat/aslib-r.git home/aslib-r
 RUN R -e "devtools::install_local('./home/aslib-r/aslib')"
 
 # copy app files to image

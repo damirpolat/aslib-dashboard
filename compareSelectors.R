@@ -129,7 +129,7 @@ server = function(input, output) {
   
   # convert data into llama format
   scenario_data = reactive(get_data(load_scenario()))
-  get_ids = reactive(scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids]) 
+  ids = reactive(get_ids(scenario_data())) #scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids]) 
   
   # compute metrics of interest
   penalties1 = reactive(misclassificationPenalties(scenario_data(), temp_vals$selector1))
@@ -137,8 +137,8 @@ server = function(input, output) {
   par1 = reactive(parscores(scenario_data(), temp_vals$selector1))
   par2 = reactive(parscores(scenario_data(), temp_vals$selector2))
   
-  build_mcp = reactive(build_data(get_ids(), penalties1(), penalties2(), par1 = NULL, par2 = NULL))
-  build_par = reactive(build_data(get_ids(), penalties1 = NULL, penalties2 = NULL, par1(), par2()))
+  build_mcp = reactive(build_data(ids(), penalties1(), penalties2()))
+  build_par = reactive(build_data(ids(), par1(), par2()))
   # create data for plot
   data = reactive(
     if (input$metric == "mcp") {
@@ -213,7 +213,7 @@ server = function(input, output) {
   }, include.rownames = FALSE)
   
   
-  tooltip = reactive(paste("instance_id = ", get_ids(), "<br>x = ", 
+  tooltip = reactive(paste("instance_id = ", ids(), "<br>x = ", 
                            data()$x, "<br>y = ", data()$y))
   
   # make names for selectors
