@@ -42,9 +42,9 @@ RUN R -e "devtools::install_local('./home/aslib-r/aslib')"
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN chmod +x /usr/bin/shiny-server.sh
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
-COPY compareSelectors.R /srv/shiny-server/
-COPY helpers.R /srv/shiny-server/
-COPY data /srv/shiny-server/
+COPY ../compareSelectors.R /srv/shiny-server/
+COPY ../helpers.R /srv/shiny-server/
+COPY ../data /srv/shiny-server/
 
 # allow permission
 RUN sudo chown -R shiny:shiny /srv/shiny-server
