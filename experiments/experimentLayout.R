@@ -1,11 +1,11 @@
-# compareSelectors.R
+# app.R
 # Damir Pulatov
+options(shiny.maxRequestSize=100*1024^2)
 
 library(shiny)
 library(mlr)
 library(llama)
 library(aslib)
-library(purrr)
 library(scatterD3)
 library(shinyFiles)
 source("../helpers.R")
@@ -18,37 +18,41 @@ default_lines = data.frame(slope = c(0, Inf, 1), intercept = c(0, 0, 0),
 
 # Define UI 
 ui = fluidPage(
-  titlePanel(strong("Comparing Selectors")),
-  p("Compare algorithm selectors with ASlib scenarios"),
-  fluidRow(
-    column(2,
-           uiOutput("scenario_loader"),
-           uiOutput("selector1_loader"),
-           uiOutput("selector2_loader"),
-           actionButton("run", "Run!")
-    ), 
-    column(1,
-           selectInput("scenario_type", label = h5(strong("Scenario source")),
-                       choices = c("ASlib", "Custom")),
-           selectInput("selector1_type", label = h5(strong("Selector source")),
-                       choices = c("mlr/llama", "Custom")),
-           selectInput("selector2_type", label = h5(strong("Selector source")),
-                       choices = c("mlr/llama", "Custom"))
-    ),
-    column(7, offset = 0, verbatimTextOutput("out")),
-    #column(7, offset = 0, scatterD3Output("plot1")), 
-    column(2,
-           selectInput("metric", "Select metric", choices = c("mcp", "par10")),
-           tableOutput("summary")
-    ),
-    mainPanel()
+  br(),
+  titlePanel(strong("Visualize Results of Algorithm Selection Experiments")),
+  sidebarPanel(width = 3,
+      fluidRow(
+        column(7,
+             uiOutput("scenario_loader"),
+             uiOutput("selector1_loader"),
+             uiOutput("selector2_loader"),
+             actionButton("run", "Run!"),
+        ),
+        column(width = 5,
+               selectInput("scenario_type", label = h4(strong("Scenario source")),
+                           choices = c("ASlib", "Custom")),
+               selectInput("selector1_type", label = h4(strong("Selector source")),
+                           choices = c("mlr/llama", "Custom")),
+               selectInput("selector2_type", label = h4(strong("Selector source")),
+                           choices = c("mlr/llama", "Custom"))
+        )
+      )
+  ),
+  mainPanel(width = 9,
+    fluidRow(
+      column(10, offset = 0, scatterD3Output("plot1")), 
+      column(2,
+             selectInput("metric", "Select metric", choices = c("mcp", "par10")),
+             htmlOutput("summary")
+      )
+  )
+    #mainPanel()
   )
 )
 
 # Define server logic 
 server = function(input, output) {
   lines = reactive({ default_lines })
-  
   shinyDirChoose(
     input,
     'scenario_upload',
@@ -90,21 +94,83 @@ server = function(input, output) {
   # dynamic UI for selecting selectors
   output$selector1_loader = renderUI({
     switch(input$selector1_type,
-           "mlr/llama" = textInput("selector1", label = h4(strong("Type learner name")),
-                                   placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector1_file", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
+           "mlr/llama" = textInput("learner1", label = h4(strong("Type learner name")),
+                                   placeholder = "ex. regr.featureless"),
+           "Custom" =  list(
+             fileInput("selector1_upload", label = h4(strong("Upload selector results")),
+                       accept = c(".RData", ".rds")))
     )
   })
   
   # dynamic UI for selecting selectors
   output$selector2_loader = renderUI({
     switch(input$selector2_type,
-           "mlr/llama" = textInput("selector2", label = h4(strong("Type learner name")),
-                                   placeholder = "ex. Random Forest", value = "regr.featureless"),
-           "Custom" =  list(fileInput("selector2_file", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
+           "mlr/llama" = textInput("learner2", label = h4(strong("Type learner name")),
+                                   placeholder = "ex. regr.featureless"),
+           "Custom" =  list(
+             fileInput("selector2_upload", label = h4(strong("Upload selector results")),
+                       accept = c(".RData", ".rds")))
     )
+  })
+  
+  
+  results = reactiveValues(data = NULL)
+  selectors = reactiveValues(learner1 = NULL,
+                             learner2 = NULL,
+                             file1 = NULL,
+                             file2 = NULL)
+  # get names of learners
+  observeEvent(input$run, {
+    req(input$learner1)
+    selectors$learner1 = input$learner1
+  })
+  observeEvent(input$run, {
+    req(input$learner2)
+    selectors$learner2 = input$learner2
+  })
+  
+  observeEvent(input$run, {
+    req(input$selector1_upload)
+    selectors$file1 = input$selector1_upload
+  })
+  observeEvent(input$run, {
+    req(input$selector2_upload)
+    selectors$file2 = input$selector2_upload
+  })
+  
+  
+  # build selectors
+  selector1 = reactive({
+    if(input$selector1_type == "Custom") {
+      req(selectors$file1)
+      return(create_model(type = "Custom", 
+                          learner_name = NULL, 
+                          file_name = selectors$file1,
+                          data = NULL))
+    } else if(input$selector1_type == "mlr/llama") {
+      req(selectors$learner1)
+      return(create_model(type = "mlr/llama", 
+                          learner_name = selectors$learner1, 
+                          file_name = NULL,
+                          data = scenario_data()))
+    }
+  })
+  
+  
+  selector2 = reactive({
+    if(input$selector2_type == "Custom") {
+      req(selectors$file2)
+      return(create_model(type = "Custom", 
+                          learner_name = NULL, 
+                          file_name = selectors$file2,
+                          data = NULL))
+    } else if(input$selector2_type == "mlr/llama") {
+      req(selectors$learner2)
+      return(create_model(type = "mlr/llama", 
+                          learner_name = selectors$learner2, 
+                          file_name = NULL,
+                          data = scenario_data()))
+    }
   })
   
   
@@ -115,77 +181,37 @@ server = function(input, output) {
   
   # convert data into llama format
   scenario_data = reactive(get_data(load_scenario()))
-  get_ids = reactive(scenario_data()$data[unlist(scenario_data()$test), scenario_data()$ids])
-  
-  # handle file path
-  global$selector1_file = getwd()
-  file1 = reactive(input$selector1_file)
-  observeEvent(ignoreNULL = TRUE,
-       eventExpr = {
-         input$selector1_file
-       },
-       handlerExpr = {
-         global$selector1_file = file1()
-       }
-  )
-  
-  output$out = reactive(global$selector1_file)
-  file2 = reactive(input$selector2_file)
-  # handle file path
-  global$selector2_file = getwd()
-  observeEvent(ignoreNULL = TRUE,
-               eventExpr = {
-                 input$selector2_file
-               },
-               handlerExpr = {
-                 global$selector2_file = file2()
-               }
-  )
-  
-  # create or read models
-  model1 = reactive(create_model(type = input$selector1_type, 
-                                 learner_name = input$selector1, 
-                                 #file_name = NULL,
-                                 file_name = global$selector1_file, 
-                                 data = scenario_data()))
-  model2 = reactive(create_model(type = input$selector2_type, 
-                                 learner_name = input$selector2, 
-                                 #file_name = NULL,
-                                 file_name = global$selector2_file,
-                                 data = scenario_data()))
-
-  
-
+  ids = reactive(get_ids(scenario_data())) 
   
   # compute metrics of interest
-  penalties1 = reactive(misclassificationPenalties(scenario_data(), model1()))
-  penalties2 = reactive(misclassificationPenalties(scenario_data(), model2()))
-  par1 = reactive(parscores(scenario_data(), model1()))
-  par2 = reactive(parscores(scenario_data(), model2()))
+  penalties1 = reactive(misclassificationPenalties(scenario_data(), selector1()))
+  penalties2 = reactive(misclassificationPenalties(scenario_data(), selector2()))
+  par1 = reactive(parscores(scenario_data(), selector1()))
+  par2 = reactive(parscores(scenario_data(), selector2()))
   
-  build_mcp = reactive(build_data(get_ids(), penalties1(), penalties2(), par1 = NULL, par2 = NULL))
-  build_par = reactive(build_data(get_ids(), penalties1 = NULL, penalties2 = NULL, par1(), par2()))
+  build_mcp = reactive(build_data(ids(), penalties1(), penalties2()))
+  build_par = reactive(build_data(ids(), par1(), par2()))
   # create data for plot
-  data = reactive(
+  observe({
     if (input$metric == "mcp") {
-      build_mcp()
+      results$data = build_mcp()
     } else if (input$metric == "par10") {
-      build_par()
+      results$data = build_par()
     }
-  )
+  })
   
   # compute mean mcp for each model
-  single_mcp = reactive(compute_metric(load_scenario(), scenario_data(), choice = "sbs", 
+  single_mcp = reactive(compute_metric(scenario_data(), choice = "sbs", 
                                        method = "mcp"))
-  virtual_mcp = reactive(compute_metric(load_scenario(), scenario_data(), choice = "vbs", 
+  virtual_mcp = reactive(compute_metric(scenario_data(), choice = "vbs", 
                                         method = "mcp"))
   model1_mcp = reactive(mean(penalties1()))
   model2_mcp = reactive(mean(penalties2()))
   
   # compute mean par10 for each model
-  single_par = reactive(compute_metric(load_scenario(), scenario_data(), choice = "sbs", 
+  single_par = reactive(compute_metric(scenario_data(), choice = "sbs", 
                                        method = "par10"))
-  virtual_par = reactive(compute_metric(load_scenario(), scenario_data(), choice = "vbs", 
+  virtual_par = reactive(compute_metric(scenario_data(), choice = "vbs", 
                                         method = "par10"))
   model1_par = reactive(mean(par1()))
   model2_par = reactive(mean(par2()))
@@ -196,38 +222,57 @@ server = function(input, output) {
   model1_gap_par = reactive(compute_gap(model1_par(), virtual_par(), single_par()))
   model2_gap_par = reactive(compute_gap(model2_par(), virtual_par(), single_par()))
   
+  
   # might need to rewrite this
   temp_vals = reactiveValues()
   observe({
-    
     if(input$metric == "mcp") {
-      temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
-      #row.names(temp_vals$summary) = "Percentage Gap Closed"
-      #colnames(temp_vals$summary) = c("sbs", "vbs", paste(input$selector1), paste(input$selector2))
-      #temp_vals$summary = temp_vals$tmp
-      #temp_vals$summary[, input$selector1] = model1_mcp()
+      temp_vals$gap1 = model1_gap_mcp()
+      temp_vals$gap2 = model2_gap_mcp()
     } else if (input$metric == "par10") {
-      temp_vals$summary = data.frame("x" = model1_gap_par(), "y" = model1_gap_par())
+      temp_vals$gap1 = model1_gap_par()
+      temp_vals$gap2 = model2_gap_par()
     }
-    
   })
   
   # build summary for mcp
-  output$summary = renderTable({
-    temp_vals$summary
-  }, include.rownames = FALSE)
+  output$summary = renderUI({
+    summary1 = paste("Percentage gap closed between single best and virtual best solvers:")
+    summary2 = paste("<b>", selector1_name(), "</b>: ", temp_vals$gap1, "%", sep = "")
+    summary3 = paste("<b>", selector2_name(), "</b>: ", temp_vals$gap2, "%", sep = "")
+    HTML(paste(summary1, summary2, summary3, sep = "<br/>"))
+  })
   
   
-  tooltip = reactive(paste("instance_id = ", data()$instance_id, "<br>x = ", 
-                           data()$x, "<br>y = ", data()$y))
+  tooltip = reactive(paste("instance_id = ", ids(), "<br>", selector1_name(), 
+                           " = ", results$data$x, "<br>", selector2_name(), " = ", results$data$y))
   
-  make_par_title = reactive( paste("PAR10 Scores for ", input$selector1, " vs. ", input$selector2) )
+  # make names for selectors
+  selector1_name = eventReactive(input$run, {
+    if(input$selector1_type == "mlr/llama") {
+      selectors$learner1
+    } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
+      selectors$file1$name
+    }
+  })
+  
+  selector2_name = eventReactive(input$run, {
+    if(input$selector2_type == "mlr/llama") {
+      selectors$learner2
+    } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
+      selectors$file2$name
+    }
+  })
+  
+  make_par_title = reactive({
+    paste("PAR10 Scores for ", selector1_name(), " vs. ", selector2_name())
+  })
   
   plot.text = reactive({
     if(input$metric == "mcp") {
-      paste("Misclassification Penalties for ", input$selector1, " vs. ", input$selector2)
+      paste("Misclassification Penalties for ", selector1_name(), " vs. ", selector2_name())
     } else if (input$metric == "par10") {
-      paste("PAR10 Scores for ", input$selector1, " vs. ", input$selector2)
+      paste("PAR10 Scores for ", selector1_name(), " vs. ", selector2_name())
     }
   })
   
@@ -241,9 +286,10 @@ server = function(input, output) {
   
   # make scatterplot with misclassification penalties
   output$plot1 = renderScatterD3({
-    scatterD3(data = data(), x = x, y = y, tooltip_text = tooltip(),
+    req(results$data)
+    scatterD3(data = results$data, x = x, y = y, tooltip_text = tooltip(),
               tooltip_position = "top right",
-              xlab = input$selector1, ylab = input$selector2,
+              xlab = selector1_name(), ylab = selector2_name(),
               point_size = 100, point_opacity = 0.5,
               hover_size = 3, hover_opacity = 1,
               color = "purple",
