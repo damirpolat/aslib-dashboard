@@ -90,7 +90,8 @@ server = function(input, output) {
     switch(input$selector1_type,
            "mlr/llama" = textInput("learner1", label = h4(strong("Type learner name")),
                                    placeholder = "ex. regr.featureless"),
-           "Custom" =  list(fileInput("selector1_upload", label = "Upload selector results",
+           "Custom" =  list(
+             fileInput("selector1_upload", label = "Upload selector results",
                                       accept = c(".RData", ".rds")))
     )
   })
@@ -100,27 +101,70 @@ server = function(input, output) {
     switch(input$selector2_type,
            "mlr/llama" = textInput("learner2", label = h4(strong("Type learner name")),
                                    placeholder = "ex. regr.featureless"),
-           "Custom" =  list(fileInput("selector2_upload", label = "Upload selector results",
+           "Custom" =  list(
+             fileInput("selector2_upload", label = "Upload selector results",
                                       accept = c(".RData", ".rds")))
     )
   })
   
-  # get names of learners
-  learner1 = eventReactive(input$run, {
-                req(input$learner1)
-                input$learner1
-              })
-  learner2 = eventReactive(input$run, {
-                req(input$learner2)
-                input$learner2
-              })
   
-
-  file1 = eventReactive(input$run, {
-              input$selector1_upload
+  results = reactiveValues(data = NULL)
+  selectors = reactiveValues(learner1 = NULL,
+                             learner2 = NULL,
+                             file1 = NULL,
+                             file2 = NULL)
+  # get names of learners
+  observeEvent(input$run, {
+    req(input$learner1)
+    selectors$learner1 = input$learner1
   })
-  file2 = eventReactive(input$run, {
-              input$selector2_upload
+  observeEvent(input$run, {
+    req(input$learner2)
+    selectors$learner2 = input$learner2
+  })
+  
+  observeEvent(input$run, {
+    req(input$selector1_upload)
+    selectors$file1 = input$selector1_upload
+  })
+  observeEvent(input$run, {
+    req(input$selector2_upload)
+    selectors$file2 = input$selector2_upload
+  })
+  
+  
+  # build selectors
+  selector1 = reactive({
+    if(input$selector1_type == "Custom") {
+      req(selectors$file1)
+      return(create_model(type = "Custom", 
+                          learner_name = NULL, 
+                          file_name = selectors$file1,
+                          data = NULL))
+    } else if(input$selector1_type == "mlr/llama") {
+      req(selectors$learner1)
+      return(create_model(type = "mlr/llama", 
+                          learner_name = selectors$learner1, 
+                          file_name = NULL,
+                          data = scenario_data()))
+    }
+  })
+  
+  
+  selector2 = reactive({
+    if(input$selector2_type == "Custom") {
+      req(selectors$file2)
+      return(create_model(type = "Custom", 
+                          learner_name = NULL, 
+                          file_name = selectors$file2,
+                          data = NULL))
+    } else if(input$selector2_type == "mlr/llama") {
+      req(selectors$learner2)
+      return(create_model(type = "mlr/llama", 
+                          learner_name = selectors$learner2, 
+                          file_name = NULL,
+                          data = scenario_data()))
+    }
   })
   
   
@@ -142,13 +186,13 @@ server = function(input, output) {
   build_mcp = reactive(build_data(ids(), penalties1(), penalties2()))
   build_par = reactive(build_data(ids(), par1(), par2()))
   # create data for plot
-  data = reactive(
+  observe({
     if (input$metric == "mcp") {
-      build_mcp()
+      results$data = build_mcp()
     } else if (input$metric == "par10") {
-      build_par()
+      results$data = build_par()
     }
-  )
+  })
   
   # compute mean mcp for each model
   single_mcp = reactive(compute_metric(scenario_data(), choice = "sbs", 
@@ -173,40 +217,6 @@ server = function(input, output) {
   model2_gap_par = reactive(compute_gap(model2_par(), virtual_par(), single_par()))
   
   
-  # build selectors
-  selector1 = reactive({
-    if(input$selector1_type == "Custom") {
-      req(file1())
-      return(create_model(type = "Custom", 
-                   learner_name = NULL, 
-                   file_name = file1(),
-                   data = scenario_data()))
-    } else if(input$selector1_type == "mlr/llama") {
-      req(learner1())
-      return(create_model(type = "mlr/llama", 
-                   learner_name = learner1(), 
-                   file_name = NULL,
-                   data = scenario_data()))
-    }
-  })
-  
-  
-  selector2 = reactive({
-    if(input$selector2_type == "Custom") {
-      req(file2())
-      return(create_model(type = "Custom", 
-                           learner_name = NULL, 
-                           file_name = file2(),
-                           data = scenario_data()))
-    } else if(input$selector2_type == "mlr/llama") {
-      req(learner2())
-      return(create_model(type = "mlr/llama", 
-                           learner_name = learner2(), 
-                           file_name = NULL,
-                           data = scenario_data()))
-    }
-  })
-  
   # might need to rewrite this
   temp_vals = reactiveValues()
   observe({
@@ -225,22 +235,22 @@ server = function(input, output) {
   
   
   tooltip = reactive(paste("instance_id = ", ids(), "<br>", selector1_name(), 
-                           " = ", data()$x, "<br>", selector2_name(), " = ", data()$y))
+                           " = ", results$data$x, "<br>", selector2_name(), " = ", results$data$y))
   
   # make names for selectors
   selector1_name = eventReactive(input$run, {
     if(input$selector1_type == "mlr/llama") {
-      learner1()
-    } else if(input$selector1_type == "Custom" && !is.null(file1())) {
-      file1()$name
+      selectors$learner1
+    } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
+      selectors$file1$name
     }
   })
   
   selector2_name = eventReactive(input$run, {
     if(input$selector2_type == "mlr/llama") {
-      learner2()
-    } else if(input$selector2_type == "Custom" && !is.null(file2())) {
-      file2()$name
+      selectors$learner2
+    } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
+      selectors$file2$name
     }
   })
   
@@ -266,7 +276,8 @@ server = function(input, output) {
   
   # make scatterplot with misclassification penalties
   output$plot1 = renderScatterD3({
-    scatterD3(data = data(), x = x, y = y, tooltip_text = tooltip(),
+    req(results$data)
+    scatterD3(data = results$data, x = x, y = y, tooltip_text = tooltip(),
               tooltip_position = "top right",
               xlab = selector1_name(), ylab = selector2_name(),
               point_size = 100, point_opacity = 0.5,

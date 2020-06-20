@@ -1,13 +1,12 @@
 fix bug that doesn't let you zoom in/out when only mcp or par is selected. only appeared after I added them both -- done
 refactor code
-let users load their own RData or any other files with algorithm selection results
+let users load their own RData or any other files with algorithm selection results -- done
 let users load their own scenarios -- done
-add more visualization options
 add virtual best and single best solver statistics to the plot. also add mean mcp and par10 scores for each selector -- done
+bug with not updating title and text for plot -- need to install github version of scatterD3
+add more visualization options
 add more interesting theme
 add colorblind friendly colors
-maybe even remove par10 scores
-bug with not updating title and text for plot
 add loading animations
 
 modules: module for selecting and loading scenarios; module for selecting learners; module for visualizing that takes outputs 
