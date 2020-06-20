@@ -38,7 +38,7 @@ ui = fluidPage(
     column(7, offset = 0, scatterD3Output("plot1")), 
     column(2,
            selectInput("metric", "Select metric", choices = c("mcp", "par10")),
-           tableOutput("summary")
+           htmlOutput("summary")
     ),
     mainPanel()
   )
@@ -221,17 +221,23 @@ server = function(input, output) {
   temp_vals = reactiveValues()
   observe({
     if(input$metric == "mcp") {
-      temp_vals$summary = data.frame("x" = model1_gap_mcp(), "y" = model2_gap_mcp())
+      temp_vals$gap1 = model1_gap_mcp()
+      temp_vals$gap2 = model2_gap_mcp()
     } else if (input$metric == "par10") {
-      temp_vals$summary = data.frame("x" = model1_gap_par(), "y" = model2_gap_par())
+      temp_vals$gap1 = model1_gap_par()
+      temp_vals$gap2 = model2_gap_par()
     }
-    
+    temp_vals$summary = sprintf("Percentage gap closed between single best and virtual best solvers:\n
+                      %s: %s\n%s: %s\n", selector1_name(), temp_vals$gap1, selector2_name(), temp_vals$gap2)
   })
   
   # build summary for mcp
-  output$summary = renderTable({
-    temp_vals$summary
-  }, include.rownames = FALSE)
+  output$summary = renderUI({
+    summary1 = paste("Percentage gap closed between single best and virtual best solvers:")
+    summary2 = paste("<b>", selector1_name(), "</b>: ", temp_vals$gap1)
+    summary3 = paste("<b>", selector2_name(), "</b>: ", temp_vals$gap2)
+    HTML(paste(summary1, summary2, summary3, sep = "<br/>"))
+  })
   
   
   tooltip = reactive(paste("instance_id = ", ids(), "<br>", selector1_name(), 
