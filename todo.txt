@@ -5,13 +5,15 @@ let users load their own scenarios -- done
 add virtual best and single best solver statistics to the plot. also add mean mcp and par10 scores for each selector -- done
 bug with not updating title and text for plot -- need to install github version of scatterD3
 add better summary for gaps closed -- done
+add more interesting theme -- done
 
+change app layout
 add more visualization options
-add more interesting theme
 add colorblind friendly colors
 add loading animations
 scatter plot comparison with single best and virtual best solvers
-
+do not reload data or selector if nothing changed
+maybe switch to dashboard 
 
 modules: module for selecting and loading scenarios; module for selecting learners; module for visualizing that takes outputs 
 of both learner and scenario modules.

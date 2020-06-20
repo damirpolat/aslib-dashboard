@@ -46,7 +46,7 @@ compute_metric = function(data, choice, method) {
 
 # compute percentage of closed gap
 compute_gap =  function(model_val, vbs_val, sbs_val) {
-  return(round(1 - (model_val - vbs_val) / (sbs_val - vbs_val), 2))
+  return(round(1 - (model_val - vbs_val) / (sbs_val - vbs_val), 2) * 100)
 }
 
 

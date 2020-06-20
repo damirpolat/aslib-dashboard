@@ -1,4 +1,4 @@
-# compareSelectors.R
+# app.R
 # Damir Pulatov
 options(shiny.maxRequestSize=100*1024^2)
 
@@ -8,6 +8,7 @@ library(llama)
 library(aslib)
 library(scatterD3)
 library(shinyFiles)
+library(shinythemes)
 source("./helpers.R")
 
 set.seed(1L)
@@ -18,29 +19,36 @@ default_lines = data.frame(slope = c(0, Inf, 1), intercept = c(0, 0, 0),
 
 # Define UI 
 ui = fluidPage(
-  titlePanel(strong("Comparing Selectors")),
-  p("Compare algorithm selectors with ASlib scenarios"),
-  fluidRow(
-    column(2,
-           uiOutput("scenario_loader"),
-           uiOutput("selector1_loader"),
-           uiOutput("selector2_loader"),
-           actionButton("run", "Run!")
-    ), 
-    column(1,
-           selectInput("scenario_type", label = h5(strong("Scenario source")),
-                       choices = c("ASlib", "Custom")),
-           selectInput("selector1_type", label = h5(strong("Selector source")),
-                       choices = c("mlr/llama", "Custom")),
-           selectInput("selector2_type", label = h5(strong("Selector source")),
-                       choices = c("mlr/llama", "Custom"))
-    ),
-    column(7, offset = 0, scatterD3Output("plot1")), 
-    column(2,
-           selectInput("metric", "Select metric", choices = c("mcp", "par10")),
-           htmlOutput("summary")
-    ),
-    mainPanel()
+  theme = shinytheme("readable"),
+  br(),
+  titlePanel(strong("Visualize Results of Algorithm Selection Experiments")),
+  sidebarPanel(width = 3,
+               fluidRow(
+                 column(7,
+                        uiOutput("scenario_loader"),
+                        uiOutput("selector1_loader"),
+                        uiOutput("selector2_loader"),
+                        actionButton("run", "Run!"),
+                 ),
+                 column(width = 5,
+                        selectInput("scenario_type", label = h4(strong("Scenario source")),
+                                    choices = c("ASlib", "Custom")),
+                        selectInput("selector1_type", label = h4(strong("Selector source")),
+                                    choices = c("mlr/llama", "Custom")),
+                        selectInput("selector2_type", label = h4(strong("Selector source")),
+                                    choices = c("mlr/llama", "Custom"))
+                 )
+               )
+  ),
+  mainPanel(width = 9,
+            fluidRow(
+              column(10, offset = 0, scatterD3Output("plot1")), 
+              column(2,
+                     selectInput("metric", "Select metric", choices = c("mcp", "par10")),
+                     htmlOutput("summary")
+              )
+            )
+            #mainPanel()
   )
 )
 
@@ -91,8 +99,8 @@ server = function(input, output) {
            "mlr/llama" = textInput("learner1", label = h4(strong("Type learner name")),
                                    placeholder = "ex. regr.featureless"),
            "Custom" =  list(
-             fileInput("selector1_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
+             fileInput("selector1_upload", label = h4(strong("Upload selector results")),
+                       accept = c(".RData", ".rds")))
     )
   })
   
@@ -102,8 +110,8 @@ server = function(input, output) {
            "mlr/llama" = textInput("learner2", label = h4(strong("Type learner name")),
                                    placeholder = "ex. regr.featureless"),
            "Custom" =  list(
-             fileInput("selector2_upload", label = "Upload selector results",
-                                      accept = c(".RData", ".rds")))
+             fileInput("selector2_upload", label = h4(strong("Upload selector results")),
+                       accept = c(".RData", ".rds")))
     )
   })
   
@@ -227,15 +235,13 @@ server = function(input, output) {
       temp_vals$gap1 = model1_gap_par()
       temp_vals$gap2 = model2_gap_par()
     }
-    temp_vals$summary = sprintf("Percentage gap closed between single best and virtual best solvers:\n
-                      %s: %s\n%s: %s\n", selector1_name(), temp_vals$gap1, selector2_name(), temp_vals$gap2)
   })
   
   # build summary for mcp
   output$summary = renderUI({
     summary1 = paste("Percentage gap closed between single best and virtual best solvers:")
-    summary2 = paste("<b>", selector1_name(), "</b>: ", temp_vals$gap1)
-    summary3 = paste("<b>", selector2_name(), "</b>: ", temp_vals$gap2)
+    summary2 = paste("<b>", selector1_name(), "</b>: ", temp_vals$gap1, "%", sep = "")
+    summary3 = paste("<b>", selector2_name(), "</b>: ", temp_vals$gap2, "%", sep = "")
     HTML(paste(summary1, summary2, summary3, sep = "<br/>"))
   })
   
