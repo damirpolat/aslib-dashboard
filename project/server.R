@@ -76,6 +76,23 @@ server = function(input, output) {
     )
   })
   
+  # scenario summary
+  output$scenario_summary = renderPrint({
+    req(load_scenario())
+    print(load_scenario())
+  })
+  
+  # selector summaries
+  output$selector1_summary= renderPrint({
+    req(selector1())
+    print(selector1())
+  })
+  
+  # selector summaries
+  output$selector2_summary= renderPrint({
+    req(selector2())
+    print(selector2())
+  })
   
   results = reactiveValues(data = NULL)
   selectors = reactiveValues(learner1 = NULL,

@@ -14,6 +14,7 @@ add loading animations
 scatter plot comparison with single best and virtual best solvers
 do not reload data or selector if nothing changed
 add summary for inputs: name of scenario, selectors, number of instances, mean runtime, etc.
+add summary when all data is loaded
 
 modules: module for selecting and loading scenarios; module for selecting learners; module for visualizing that takes outputs 
 of both learner and scenario modules.

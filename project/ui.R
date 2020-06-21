@@ -19,10 +19,10 @@ ui = dashboardPage(
       tabItem(tabName = "inputs",
         fluidRow(
           column(3,
-                 uiOutput("scenario_loader"),
-                 uiOutput("selector1_loader"),
-                 uiOutput("selector2_loader"),
-                 actionButton("run", "Run!"),
+            uiOutput("scenario_loader"),
+            uiOutput("selector1_loader"),
+            uiOutput("selector2_loader"),
+            actionButton("run", "Run!")
           ),
           column(width = 2,
                  selectInput("scenario_type", label = h4(strong("Scenario source")),
@@ -32,6 +32,21 @@ ui = dashboardPage(
                  selectInput("selector2_type", label = h4(strong("Selector source")),
                              choices = c("mlr/llama", "Custom"))
           )
+        ),
+        br(),
+        br(),
+        column(width = 4,
+          tags$h4(strong("Scenario summary")),
+          #htmlOutput("scenario_summary", label = h4(strong("Scenario summary")),
+          verbatimTextOutput("scenario_summary")
+        ),
+        column(width = 2,
+          tags$h4(strong("Selector summary")),
+          verbatimTextOutput("selector1_summary")
+        ),
+        column(width = 2,
+          tags$h4(strong("Selector summary")),
+          verbatimTextOutput("selector2_summary")
         )
       ),
       # comparison tab
