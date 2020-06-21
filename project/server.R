@@ -1,6 +1,5 @@
-# app.R
+# server.R
 # Damir Pulatov
-options(shiny.maxRequestSize=100*1024^2)
 
 library(shiny)
 library(mlr)
@@ -8,51 +7,14 @@ library(llama)
 library(aslib)
 library(scatterD3)
 library(shinyFiles)
-library(shinythemes)
-source("./project/helpers.R")
-
+source("./helpers.R")
 set.seed(1L)
 
 # reference lines for scatter plot
 default_lines = data.frame(slope = c(0, Inf, 1), intercept = c(0, 0, 0), 
                            stroke_width = 1, stroke_dasharray = 5)
 
-# Define UI 
-ui = fluidPage(
-  theme = shinytheme("readable"),
-  br(),
-  titlePanel(strong("Visualize Algorithm Selection Experiments")),
-  sidebarPanel(width = 3,
-               fluidRow(
-                 column(7,
-                        uiOutput("scenario_loader"),
-                        uiOutput("selector1_loader"),
-                        uiOutput("selector2_loader"),
-                        actionButton("run", "Run!"),
-                 ),
-                 column(width = 5,
-                        selectInput("scenario_type", label = h4(strong("Scenario source")),
-                                    choices = c("ASlib", "Custom")),
-                        selectInput("selector1_type", label = h4(strong("Selector source")),
-                                    choices = c("mlr/llama", "Custom")),
-                        selectInput("selector2_type", label = h4(strong("Selector source")),
-                                    choices = c("mlr/llama", "Custom"))
-                 )
-               )
-  ),
-  mainPanel(width = 9,
-            fluidRow(
-              column(10, offset = 0, scatterD3Output("plot1")), 
-              column(2,
-                     selectInput("metric", "Select metric", choices = c("mcp", "par10")),
-                     htmlOutput("summary")
-              )
-            )
-  )
-)
-
-# Define server logic 
-server = function(input, output) {
+server = function(input, output) { 
   lines = reactive({ default_lines })
   shinyDirChoose(
     input,
@@ -300,6 +262,3 @@ server = function(input, output) {
               transitions = TRUE)
   })
 }
-
-# Run the app 
-shinyApp(ui = ui, server = server)
