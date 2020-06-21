@@ -35,17 +35,17 @@ ui = dashboardPage(
         ),
         br(),
         br(),
+        # summary
         column(width = 4,
-          tags$h4(strong("Scenario summary")),
-          #htmlOutput("scenario_summary", label = h4(strong("Scenario summary")),
+          htmlOutput("scenario_title"),
           verbatimTextOutput("scenario_summary")
         ),
         column(width = 2,
-          tags$h4(strong("Selector summary")),
+          htmlOutput("selector1_title"),
           verbatimTextOutput("selector1_summary")
         ),
         column(width = 2,
-          tags$h4(strong("Selector summary")),
+          htmlOutput("selector2_title"),
           verbatimTextOutput("selector2_summary")
         )
       ),
