@@ -3,4 +3,4 @@ Interactive web dashboard to help visualize the results of algorithm selection e
 
 Run dash.R or build a Docker container from container directory.
 
-app.R contains basic app version of the same app. Use dash instead.
+app.R contains old app UI. Use dash instead.
