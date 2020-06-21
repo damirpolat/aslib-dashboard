@@ -30,6 +30,7 @@ RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION 
 
 # install R packages
 RUN R -e "install.packages('shinyFiles')"
+RUN R -e "install.packages('shinythemes')"
 RUN R -e "install.packages('rJava')"
 RUN R -e "install.packages('devtools')"
 RUN R -e "devtools::install_github('https://github.com/juba/scatterD3')"
