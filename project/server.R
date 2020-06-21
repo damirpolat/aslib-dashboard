@@ -81,17 +81,30 @@ server = function(input, output) {
     req(load_scenario())
     print(load_scenario())
   })
+  output$scenario_title = renderUI({
+    req(load_scenario())
+    h4(strong("Scenario summary"))
+  })
+  
   
   # selector summaries
-  output$selector1_summary= renderPrint({
+  output$selector1_summary = renderPrint({
     req(selector1())
     print(selector1())
+  })
+  output$selector1_title = renderUI({
+    req(selector1())
+    h4(strong(paste(" ", selector1_name(), "summary")))
   })
   
   # selector summaries
   output$selector2_summary= renderPrint({
     req(selector2())
     print(selector2())
+  })
+  output$selector2_title = renderUI({
+    req(selector2())
+    h4(strong(paste(" ", selector2_name(), "summary")))
   })
   
   results = reactiveValues(data = NULL)
