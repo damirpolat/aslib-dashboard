@@ -31,6 +31,7 @@ RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION 
 # install R packages
 RUN R -e "install.packages('shinyFiles')"
 RUN R -e "install.packages('shinythemes')"
+RUN R -e "install.packages('shinydashboard')"
 RUN R -e "install.packages('rJava')"
 RUN R -e "install.packages('devtools')"
 RUN R -e "devtools::install_github('https://github.com/juba/scatterD3')"
@@ -43,8 +44,7 @@ RUN R -e "devtools::install_local('./home/aslib-r/aslib')"
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN chmod +x /usr/bin/shiny-server.sh
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
-COPY ../app.R /srv/shiny-server/
-COPY ../helpers.R /srv/shiny-server/
+COPY project /srv/shiny-server/
 COPY ../data /srv/shiny-server/
 
 # allow permission
@@ -52,4 +52,4 @@ RUN sudo chown -R shiny:shiny /srv/shiny-server
 
 EXPOSE 80
 
-CMD ["R", "-e", "shiny::runApp('/srv/shiny-server/app.R', host='0.0.0.0', port=80)"]
+CMD ["R", "-e", "shiny::runApp('/srv/shiny-server/dash.R', host='0.0.0.0', port=80)"]
