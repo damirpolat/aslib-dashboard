@@ -60,18 +60,12 @@ model1_gap = reactive(compute_gap(model1_mean(), virtual_mean(), single_mean()))
 model2_gap = reactive(compute_gap(model2_mean(), virtual_mean(), single_mean()))
 
 
-# might need to rewrite this
-temp_vals = reactiveValues()
-observe({
-  temp_vals$gap1 = model1_gap()
-  temp_vals$gap2 = model2_gap()
-})
-
 # build summary for mcp
 output$summary = renderUI({
+  req(results$data)
   summary1 = paste("Percentage gap closed between single best and virtual best solvers:")
-  summary2 = paste("<b>", names$selector1_name, "</b>: ", temp_vals$gap1, "%", sep = "")
-  summary3 = paste("<b>", names$selector2_name, "</b>: ", temp_vals$gap2, "%", sep = "")
+  summary2 = paste("<b>", names$selector1_name, "</b>: ", model1_gap(), "%", sep = "")
+  summary3 = paste("<b>", names$selector2_name, "</b>: ", model2_gap(), "%", sep = "")
   HTML(paste(summary1, summary2, summary3, sep = "<br/>"))
 })
 
