@@ -15,8 +15,9 @@ ui = dashboardPage(
                   titleWidth = 440),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Input", tabName = "inputs", icon = icon("folder-open")),
-      menuItem("Comparison", tabName = "compare", icon = icon("balance-scale"))
+      menuItem("Input", tabName = "inputs", icon = icon("file-import")),
+      menuItem("Comparison", tabName = "compare", icon = icon("chart-area")),
+      menuItem("Insight", tabName = "insight", icon = icon("chart-bar"))
     )
   ),
   dashboardBody(
@@ -74,6 +75,9 @@ ui = dashboardPage(
               selected = "algorithm selector")
           )
         )
+      ),
+      tabItem(tabName = "insight",
+        h2("Empty")
       )
     )
   )
