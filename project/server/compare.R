@@ -7,55 +7,64 @@ default_lines = data.frame(slope = c(0, Inf, 1), intercept = c(0, 0, 0),
 lines = reactive({ default_lines })
 
 # compute metrics of interest
-penalties1 = reactive(misclassificationPenalties(scenario_data(), selector1()))
-penalties2 = reactive(misclassificationPenalties(scenario_data(), selector2()))
-par1 = reactive(parscores(scenario_data(), selector1()))
-par2 = reactive(parscores(scenario_data(), selector2()))
-
-build_mcp = reactive(build_data(ids(), penalties1(), penalties2()))
-build_par = reactive(build_data(ids(), par1(), par2()))
-# create data for plot
+selector_metric = reactiveValues(m1 = NULL, m2 = NULL)
 observe({
-  if (input$metric == "mcp") {
-    results$data = build_mcp()
-  } else if (input$metric == "par10") {
-    results$data = build_par()
+  # calculate metric for each selector
+  if(x_axis() == "algorithm selector") {
+    selector_metric$m1 = compute_metric(data = scenario_data(), 
+                                        method = metric(), selector = selector1())
+  } else if(x_axis() == "single best solver") {
+    selector_metric$m1 = compute_metric(data = scenario_data(), 
+                                        method = metric(), selector = sbs())
+  } else if(x_axis() == "virtual best solver") {
+    selector_metric$m1 = compute_metric(data = scenario_data(), 
+                                        method = metric(), selector = vbs())
+  }
+  
+  if(y_axis() == "algorithm selector") {
+    selector_metric$m2 = compute_metric(data = scenario_data(), 
+                                        method = metric(), selector = selector2())
+  } else if(y_axis() == "single best solver") {
+    selector_metric$m2 = compute_metric(data = scenario_data(), 
+                                        method = metric(), selector = sbs())
+  } else if(y_axis() == "virtual best solver") {
+    selector_metric$m2 = compute_metric(data = scenario_data(), 
+                                        method = metric(), selector = vbs())
   }
 })
 
-# compute mean mcp for each model
-single_mcp = reactive(compute_metric(scenario_data(), choice = "sbs", 
-                                     method = "mcp"))
-virtual_mcp = reactive(compute_metric(scenario_data(), choice = "vbs", 
-                                      method = "mcp"))
-model1_mcp = reactive(mean(penalties1()))
-model2_mcp = reactive(mean(penalties2()))
+# create data for plot
+observe({
+  req(selector_metric$m1)
+  req(selector_metric$m2)
+  results$data = build_data(ids(), selector_metric$m1, selector_metric$m2)
+})
 
-# compute mean par10 for each model
-single_par = reactive(compute_metric(scenario_data(), choice = "sbs", 
-                                     method = "par10"))
-virtual_par = reactive(compute_metric(scenario_data(), choice = "vbs", 
-                                      method = "par10"))
-model1_par = reactive(mean(par1()))
-model2_par = reactive(mean(par2()))
+# compute mean metric for each model
+single_mean = reactive(mean(compute_metric(data = scenario_data(), 
+                      method = metric(), selector = sbs())))
+virtual_mean = reactive(mean(compute_metric(data = scenario_data(), 
+                      method = metric(), selector = vbs())))
+model1_mean = reactive({
+  req(selector_metric$m1)
+  mean(selector_metric$m1)
+})
+model2_mean = reactive({
+  req(selector_metric$m2)
+  mean(selector_metric$m2)
+})
+
 
 # compute gaps closed
-model1_gap_mcp = reactive(compute_gap(model1_mcp(), virtual_mcp(), single_mcp()))
-model2_gap_mcp = reactive(compute_gap(model2_mcp(), virtual_mcp(), single_mcp()))
-model1_gap_par = reactive(compute_gap(model1_par(), virtual_par(), single_par()))
-model2_gap_par = reactive(compute_gap(model2_par(), virtual_par(), single_par()))
+model1_gap = reactive(compute_gap(model1_mean(), virtual_mean(), single_mean()))
+model2_gap = reactive(compute_gap(model2_mean(), virtual_mean(), single_mean()))
 
 
 # might need to rewrite this
 temp_vals = reactiveValues()
 observe({
-  if(input$metric == "mcp") {
-    temp_vals$gap1 = model1_gap_mcp()
-    temp_vals$gap2 = model2_gap_mcp()
-  } else if (input$metric == "par10") {
-    temp_vals$gap1 = model1_gap_par()
-    temp_vals$gap2 = model2_gap_par()
-  }
+  temp_vals$gap1 = model1_gap()
+  temp_vals$gap2 = model2_gap()
 })
 
 # build summary for mcp

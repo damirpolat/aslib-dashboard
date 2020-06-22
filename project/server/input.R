@@ -61,6 +61,10 @@ output$selector2_loader = renderUI({
   )
 })
   
+# x and y axis
+x_axis = reactive(input$x_axis)
+y_axis = reactive(input$y_axis)
+
 # scenario summary
 output$scenario_summary = renderPrint({
   req(load_scenario())
@@ -151,21 +155,43 @@ selector2 = reactive({
   }
 })
 
+
+# get single best and virtual best solvers
+sbs = reactive({
+  req(scenario_data())
+  return(get_sbs(scenario_data()))
+})
+
+vbs = reactive({
+  req(scenario_data())
+  return(get_vbs(scenario_data()))
+})
+
 # make names for selectors
 selector1_name = eventReactive(input$run, {
-  if(input$selector1_type == "mlr/llama") {
-    selectors$learner1
-  } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
-    selectors$file1$name
+  if(x_axis() == "algorithm selector") {
+    if(input$selector1_type == "mlr/llama") {
+      selectors$learner1
+    } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
+      selectors$file1$name
+    }
+  } else {
+    x_axis()
   }
+
 })
 
 selector2_name = eventReactive(input$run, {
-  if(input$selector2_type == "mlr/llama") {
-    selectors$learner2
-  } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
-    selectors$file2$name
+  if(y_axis() == "algorithm selector") {
+    if(input$selector2_type == "mlr/llama") {
+      selectors$learner2
+    } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
+      selectors$file2$name
+    }
+  } else {
+    y_axis()
   }
+
 })
   
 # function to load ASlib scenario
@@ -176,3 +202,6 @@ load_scenario = eventReactive(input$run, {
 # convert data into llama format
 scenario_data = reactive(get_data(load_scenario()))
 ids = reactive(get_ids(scenario_data())) 
+
+# store metric selection
+metric = reactive(input$metric)

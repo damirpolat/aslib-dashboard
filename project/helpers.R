@@ -10,36 +10,30 @@ build_data = function(ids, m1, m2) {
 }
 
 
+# get single best solver 
+get_sbs = function(data) {
+  sbs = llama:::singleBest(data)
+  sbs = list(predictions = sbs)
+  attr(sbs, "hasPredictions") = TRUE
+  return(sbs)
+}
+
+
+# get virtual best solver
+get_vbs = function(data) {
+  vbs = llama:::vbs(data)
+  vbs = list(predictions = vbs)
+  attr(vbs, "hasPredictions") = TRUE
+  return(vbs)
+}
+
+
 # compute mean mcp or gap closed
-compute_metric = function(data, choice, method) {
+compute_metric = function(data, method, selector) {
   if(method == "mcp") {
-    if(choice == "sbs") {
-      single = llama:::singleBest(data)
-      single = list(predictions = single)
-      attr(single, "hasPredictions") = TRUE
-      
-      val = mean(misclassificationPenalties(data, single))
-    } else if(choice == "vbs") {
-      vbs = llama:::vbs(data)
-      vbs = list(predictions = vbs)
-      attr(vbs, "hasPredictions") = TRUE
-      
-      val = mean(misclassificationPenalties(data, vbs))
-    } 
+    val = misclassificationPenalties(data, selector)
   } else if(method == "par10") {
-    if(choice == "sbs") {
-      single = llama:::singleBest(data)
-      single = list(predictions = single)
-      attr(single, "hasPredictions") = TRUE
-      
-      val = mean(parscores(data, single))
-    } else if(choice == "vbs") {
-      vbs = llama:::vbs(data)
-      vbs = list(predictions = vbs)
-      attr(vbs, "hasPredictions") = TRUE
-      
-      val = mean(parscores(data, vbs))
-    } 
+    val = parscores(data, selector)
   }
   return(val)
 }
