@@ -62,7 +62,7 @@ ui = dashboardPage(
                  selectInput("metric", "Select metric", choices = c("mcp", "par10")),
                  htmlOutput("summary")
           ),
-          linebreak(8),
+          linebreak(10),
           column(width = 1,
             radioButtons("x_axis", label = "x-axis", 
               choices = c("algorithm selector", "single best solver", "virtual best solver"),

@@ -70,26 +70,26 @@ observe({
 # build summary for mcp
 output$summary = renderUI({
   summary1 = paste("Percentage gap closed between single best and virtual best solvers:")
-  summary2 = paste("<b>", selector1_name(), "</b>: ", temp_vals$gap1, "%", sep = "")
-  summary3 = paste("<b>", selector2_name(), "</b>: ", temp_vals$gap2, "%", sep = "")
+  summary2 = paste("<b>", names$selector1_name, "</b>: ", temp_vals$gap1, "%", sep = "")
+  summary3 = paste("<b>", names$selector2_name, "</b>: ", temp_vals$gap2, "%", sep = "")
   HTML(paste(summary1, summary2, summary3, sep = "<br/>"))
 })
 
 
-tooltip = reactive(paste("instance_id = ", ids(), "<br>", selector1_name(), 
-                         " = ", results$data$x, "<br>", selector2_name(), " = ", results$data$y))
+tooltip = reactive(paste("instance_id = ", ids(), "<br>", names$selector1_name, 
+                         " = ", results$data$x, "<br>", names$selector2_name, " = ", results$data$y))
 
 
 
 make_par_title = reactive({
-  paste("PAR10 Scores for ", selector1_name(), " vs. ", selector2_name())
+  paste("PAR10 Scores for ", names$selector1_name, " vs. ", names$selector2_name)
 })
 
 plot.text = reactive({
-  if(input$metric == "mcp") {
-    paste("Misclassification Penalties for ", selector1_name(), " vs. ", selector2_name())
-  } else if (input$metric == "par10") {
-    paste("PAR10 Scores for ", selector1_name(), " vs. ", selector2_name())
+  if(metric() == "mcp") {
+    paste("Misclassification Penalties for ", names$selector1_name, " vs. ", names$selector2_name)
+  } else if (metric() == "par10") {
+    paste("PAR10 Scores for ", names$selector1_name, " vs. ", names$selector2_name)
   }
 })
 
@@ -106,7 +106,7 @@ output$plot1 = renderScatterD3({
   req(results$data)
   scatterD3(data = results$data, x = x, y = y, tooltip_text = tooltip(),
             tooltip_position = "top right",
-            xlab = selector1_name(), ylab = selector2_name(),
+            xlab = names$selector1_name, ylab = names$selector2_name,
             point_size = 100, point_opacity = 0.5,
             hover_size = 3, hover_opacity = 1,
             color = "purple",
