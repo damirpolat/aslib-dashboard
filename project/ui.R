@@ -15,8 +15,8 @@ ui = dashboardPage(
                   titleWidth = 440),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Input", tabName = "inputs", icon = icon("folder-open")),
-      menuItem("Comparison", tabName = "compare", icon = icon("balance-scale"))
+      menuItem("Input", tabName = "inputs", icon = icon("file-import")),
+      menuItem("Comparison", tabName = "compare", icon = icon("chart-area"))
     )
   ),
   dashboardBody(
