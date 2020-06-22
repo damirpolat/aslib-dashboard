@@ -4,6 +4,12 @@ library(shinyFiles)
 library(shinythemes)
 library(shinydashboard)
 
+
+# line break
+linebreak = function(n) {
+  HTML(strrep(br(), n))
+}
+
 ui = dashboardPage(
   dashboardHeader(title = "Visualize Algorithm Selection Experiments", 
                   titleWidth = 440),
@@ -33,8 +39,7 @@ ui = dashboardPage(
                              choices = c("mlr/llama", "Custom"))
           )
         ),
-        br(),
-        br(),
+        linebreak(2),
         # summary
         column(width = 4,
           htmlOutput("scenario_title"),
@@ -56,6 +61,17 @@ ui = dashboardPage(
           column(2,
                  selectInput("metric", "Select metric", choices = c("mcp", "par10")),
                  htmlOutput("summary")
+          ),
+          linebreak(10),
+          column(width = 1,
+            radioButtons("x_axis", label = "x-axis", 
+              choices = c("algorithm selector", "single best solver", "virtual best solver"),
+              selected = "algorithm selector")
+          ),
+          column(width = 1,
+            radioButtons("y_axis", label = "y-axis", 
+              choices = c("algorithm selector", "single best solver", "virtual best solver"),
+              selected = "algorithm selector")
           )
         )
       )
