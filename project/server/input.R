@@ -61,6 +61,10 @@ output$selector2_loader = renderUI({
   )
 })
   
+# x and y axis
+x_axis = reactive(input$x_axis)
+y_axis = reactive(input$y_axis)
+
 # scenario summary
 output$scenario_summary = renderPrint({
   req(load_scenario())
@@ -79,7 +83,7 @@ output$selector1_summary = renderPrint({
 })
 output$selector1_title = renderUI({
   req(selector1())
-  h4(strong(paste(" ", selector1_name(), "summary")))
+  h4(strong(paste(" ", names$selector1_name, "summary")))
 })
   
 # selector summaries
@@ -89,7 +93,7 @@ output$selector2_summary= renderPrint({
 })
 output$selector2_title = renderUI({
   req(selector2())
-  h4(strong(paste(" ", selector2_name(), "summary")))
+  h4(strong(paste(" ", names$selector2_name, "summary")))
 })
   
 results = reactiveValues(data = NULL)
@@ -151,23 +155,52 @@ selector2 = reactive({
   }
 })
 
-# make names for selectors
-selector1_name = eventReactive(input$run, {
-  if(input$selector1_type == "mlr/llama") {
-    selectors$learner1
-  } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
-    selectors$file1$name
+
+# get single best and virtual best solvers
+sbs = reactive({
+  req(scenario_data())
+  return(get_sbs(scenario_data()))
+})
+
+vbs = reactive({
+  req(scenario_data())
+  return(get_vbs(scenario_data()))
+})
+
+toListenX = reactive({
+  list(input$run, x_axis())
+})
+toListenY = reactive({
+  list(input$run, y_axis())
+})
+
+names = reactiveValues(selector1_name = NULL,
+                       selector2_name = NULL)
+observeEvent(toListenX(), {
+  if(x_axis() == "algorithm selector") {
+    if(input$selector1_type == "mlr/llama") {
+      names$selector1_name = selectors$learner1
+    } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
+      names$selector1_name = selectors$file1$name
+    }
+  } else {
+    names$selector1_name = x_axis()
   }
 })
 
-selector2_name = eventReactive(input$run, {
-  if(input$selector2_type == "mlr/llama") {
-    selectors$learner2
-  } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
-    selectors$file2$name
+observeEvent(toListenY(), {
+  if(y_axis() == "algorithm selector") {
+    if(input$selector2_type == "mlr/llama") {
+      names$selector2_name = selectors$learner2
+    } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
+      names$selector2_name = selectors$file2$name
+    }
+  } else {
+    names$selector2_name = y_axis()
   }
 })
-  
+
+
 # function to load ASlib scenario
 load_scenario = eventReactive(input$run, {
   read_scenario(input$scenario_type, global$datapath, input$scenario)
@@ -176,3 +209,6 @@ load_scenario = eventReactive(input$run, {
 # convert data into llama format
 scenario_data = reactive(get_data(load_scenario()))
 ids = reactive(get_ids(scenario_data())) 
+
+# store metric selection
+metric = reactive(input$metric)

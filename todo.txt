@@ -10,10 +10,10 @@ change app layout -- don
 maybe switch to dashboard -- done 
 add summary for inputs: name of scenario, selectors, number of instances, mean runtime, etc. -- done
 add summary when all data is loaded -- done
+scatter plot comparison with single best and virtual best solvers -- done
 
 add more visualization options
 add loading animations
-scatter plot comparison with single best and virtual best solvers
 do not reload data or selector if nothing changed
 refactor code
 
