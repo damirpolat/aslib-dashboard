@@ -16,6 +16,8 @@ add more visualization options
 add loading animations
 do not reload data or selector if nothing changed
 refactor code
+add footer
+make summary text appear only after scatter plot shows up
 
 modules: module for selecting and loading scenarios; module for selecting learners; module for visualizing that takes outputs 
 of both learner and scenario modules.
