@@ -76,14 +76,14 @@ output$scenario_title = renderUI({
 })
   
   
-# selector summaries
-output$selector1_summary = renderPrint({
-  req(selector1())
-  print(selector1())
+# algorithm summaries
+output$algo_perf = renderPrint({
+  req(load_scenario())
+  print(summarizeAlgoPerf(load_scenario(), load_scenario()$desc$performance_measures))
 })
-output$selector1_title = renderUI({
-  req(selector1())
-  h4(strong(paste(" ", names$selector1_name, "summary")))
+output$perf_title = renderUI({
+  req(load_scenario())
+  h4(strong(paste("Algorithm Summary for", load_scenario()$desc$scenario_id)))
 })
   
 # selector summaries

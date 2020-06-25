@@ -45,13 +45,9 @@ ui = dashboardPage(
           htmlOutput("scenario_title"),
           verbatimTextOutput("scenario_summary")
         ),
-        column(width = 2,
-          htmlOutput("selector1_title"),
-          verbatimTextOutput("selector1_summary")
-        ),
-        column(width = 2,
-          htmlOutput("selector2_title"),
-          verbatimTextOutput("selector2_summary")
+        column(width = 6, offset = 1,
+          htmlOutput("perf_title"),
+          verbatimTextOutput("algo_perf")
         )
       ),
       # comparison tab
