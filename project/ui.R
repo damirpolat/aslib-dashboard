@@ -17,7 +17,7 @@ ui = dashboardPage(
     sidebarMenu(
       menuItem("Input", tabName = "inputs", icon = icon("file-import")),
       menuItem("Comparison", tabName = "compare", icon = icon("chart-area")),
-      menuItem("Insight", tabName = "insight", icon = icon("chart-bar"))
+      menuItem("Errors", tabName = "errors", icon = icon("bug"))
     )
   ),
   dashboardBody(
@@ -72,7 +72,7 @@ ui = dashboardPage(
           )
         )
       ),
-      tabItem(tabName = "insight",
+      tabItem(tabName = "errors",
         h2("Empty")
       )
     )

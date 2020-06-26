@@ -111,3 +111,24 @@ get_ids = function(data) {
   ids = data$data[unlist(data$test), data$ids]
   return(ids)
 }
+
+
+# compute MSE ratios for each solver
+calculate_errors = function(scenario, data, model) {
+  errors = rbind.fill(lapply(seq_along(1:length(names(scenario$desc$metainfo_algorithms))), function(solver.id) {
+    truth = select(data$data, c("instance_id", names(scenario$desc$metainfo_algorithms)[solver.id]))
+    colnames(truth) = c("instance_id", "score")
+    truth = truth[order(truth$instance_id), ]
+    truth = truth[[2]]
+    
+    preds = subset(model$predictions, model$predictions$algorithm == names(scenario$desc$metainfo_algorithms)[solver.id])
+    preds = select(preds, c("instance_id", "score"))
+    preds = preds[order(preds$instance_id), ]
+    preds = preds[[2]]
+    error = measureRMSE(truth, preds)
+    
+    val = list(RMSE = error, solver = names(scenario$desc$metainfo_algorithms)[solver.id])
+    val = as.data.frame(val)
+    return(val)  
+  }))
+}
