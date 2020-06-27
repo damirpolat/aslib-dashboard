@@ -33,7 +33,7 @@ observeEvent(ignoreNULL = TRUE,
   },
   handlerExpr = {
    if (!"path" %in% names(scenario_dir())) return()
-   home = normalizePath("~")
+   home = normalizePath("/home/")
    global$datapath =
      file.path(home, paste(unlist(scenario_dir()$path[-1]), collapse = .Platform$file.sep))
   }
