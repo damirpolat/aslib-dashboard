@@ -77,25 +77,18 @@ output$scenario_title = renderUI({
   
   
 # algorithm summaries
-output$algo_perf = renderPrint({
+output$algo_perf = renderDataTable({
   req(load_scenario())
-  print(summarizeAlgoPerf(load_scenario(), load_scenario()$desc$performance_measures))
+  datatable(summarizeAlgoPerf(load_scenario(), load_scenario()$desc$performance_measures), 
+            height = '70px', options = list(paging = TRUE, pageLength = 8,
+                                            lengthMenu = c(8, 16, 24, 32, 40)))
 })
 output$perf_title = renderUI({
   req(load_scenario())
   h4(strong(paste("Algorithm Summary for", load_scenario()$desc$scenario_id)))
 })
   
-# selector summaries
-output$selector2_summary= renderPrint({
-  req(selector2())
-  print(selector2())
-})
-output$selector2_title = renderUI({
-  req(selector2())
-  h4(strong(paste(" ", names$selector2_name, "summary")))
-})
-  
+
 results = reactiveValues(data = NULL)
 selectors = reactiveValues(learner1 = NULL,
                            learner2 = NULL,

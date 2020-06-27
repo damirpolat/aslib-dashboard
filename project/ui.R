@@ -3,6 +3,7 @@ library(scatterD3)
 library(shinyFiles)
 library(shinythemes)
 library(shinydashboard)
+library(DT)
 
 
 # line break
@@ -39,15 +40,14 @@ ui = dashboardPage(
                              choices = c("mlr/llama", "Custom"))
           )
         ),
-        linebreak(2),
         # summary
         column(width = 4,
           htmlOutput("scenario_title"),
           verbatimTextOutput("scenario_summary")
         ),
-        column(width = 6, offset = 1,
+        column(width = 8, offset = 0,
           htmlOutput("perf_title"),
-          verbatimTextOutput("algo_perf")
+          DT::dataTableOutput("algo_perf"), style = "overflow-y: scroll;overflow-x: scroll;"
         )
       ),
       # comparison tab
