@@ -4,7 +4,7 @@
 shinyDirChoose(
   input,
   'scenario_upload',
-  roots = c(home = '~'),
+  roots = c(home = '/home/'),
   filetypes = c('', 'txt', 'arff', 'csv')
 )
   

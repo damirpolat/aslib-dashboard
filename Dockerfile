@@ -45,8 +45,8 @@ COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN chmod +x /usr/bin/shiny-server.sh
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
 COPY project /srv/shiny-server/project
-COPY data /srv/shiny-server/data
 COPY app.R /srv/shiny-server/
+COPY data /home/data
 
 # select port
 EXPOSE 3838
