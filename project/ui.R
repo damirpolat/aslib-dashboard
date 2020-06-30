@@ -12,8 +12,7 @@ linebreak = function(n) {
 }
 
 ui = dashboardPage(
-  dashboardHeader(title = "Visualize Algorithm Selection Experiments", 
-                  titleWidth = 440),
+  dashboardHeader(title = "ASlib Dashboard"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Input", tabName = "inputs", icon = icon("file-import")),
