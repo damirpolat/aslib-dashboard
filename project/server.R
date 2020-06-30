@@ -7,6 +7,8 @@ library(llama)
 library(aslib)
 library(scatterD3)
 library(shinyFiles)
+library(plyr)
+library(dplyr)
 source("./helpers.R")
 set.seed(1L)
 
