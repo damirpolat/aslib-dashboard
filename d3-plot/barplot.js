@@ -55,3 +55,14 @@ svg.append("g")
    .attr("class", "axis")
    .attr("transform", "translate(" + xPadding + ",0)")
    .call(yAxis);
+
+// add a reference line
+// fix line 
+svg.append("g")
+    .attr("class", "x axis")
+    .append("line")
+    .attr("y1", yScale(0))
+    .attr("y2", yScale(0))
+    .attr("x1", xScale(0))
+    .attr("x2", width - yPadding + 5)
+    .attr("stroke", "black");
