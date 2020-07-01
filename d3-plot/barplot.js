@@ -59,7 +59,7 @@ svg.append("g")
 // add a reference line
 // fix line 
 svg.append("g")
-    .attr("class", "x axis")
+    .attr("class", "ref line")
     .append("line")
     .attr("y1", yScale(0))
     .attr("y2", yScale(0))
