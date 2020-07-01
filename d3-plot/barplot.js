@@ -3,18 +3,20 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 var axisLine = height / 2;
+var yPadding = 50;
+var xPadding = 30;
 
 // create x scale
 var xScale = d3.scaleBand()
         .domain(d3.range(data.length))
-        .rangeRound([0, width])
+        .rangeRound([xPadding, width - xPadding - 10])
         .paddingInner(0.05);
 
 // create y scale
 var yScale = d3.scaleLinear()
         .domain([d3.min(data, function(d) { return d.RMSE; }), 
                   d3.max(data, function(d) { return d.RMSE; })])
-        .range([height, 0]);
+        .range([height - yPadding - 10, yPadding]);
 
 // adding bars
 svg.selectAll('rect')
@@ -37,4 +39,19 @@ svg.selectAll('rect')
     .attr('fill', 'steelblue')
     .attr('opacity', 0.8);
 
-// add axis
+// create axis
+var xAxis = d3.axisBottom()
+              .scale(xScale);
+var yAxis = d3.axisLeft()
+              .scale(yScale);
+              
+// draw axis
+svg.append("g")
+   .attr("class", "axis")
+   .attr("transform", "translate(0," + (height - yPadding) + ")")
+   .call(xAxis);
+   
+svg.append("g")
+   .attr("class", "axis")
+   .attr("transform", "translate(" + xPadding + ",0)")
+   .call(yAxis);
