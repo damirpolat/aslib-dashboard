@@ -5,6 +5,7 @@
 var axisLine = height / 2;
 var yPadding = 100;
 var xPadding = 30;
+var opacity = 0.4;
 
 // create x scale
 var xScale = d3.scaleBand()
@@ -18,6 +19,26 @@ var yScale = d3.scaleLinear()
                   d3.max(data, function(d) { return d.RMSE; })])
         .range([height - yPadding - 10, yPadding]);
 
+// create div for tooltip
+var body = d3.select('body')
+	.selectAll('div')
+	.enter()
+	.append('div')
+	.selectAll('p')
+	.enter()
+	.append('p')
+	.text(function(d) {
+	  return "solver: " + d.solver; 
+	 })
+	.attr('class', 'hidden')
+	.style('position','absolute')
+	.style('top', function (d) { return d.top; })
+	.style('left', function (d) { return d.left; })
+	.style('width', width + "px")
+	.style('height', height + "px")
+	.style('background-color', function (d) { return d.backgroundColor; });
+
+		
 // adding bars
 svg.selectAll('rect')
   .data(data)
@@ -37,7 +58,34 @@ svg.selectAll('rect')
       return xScale(i);
     })
     .attr('fill', 'steelblue')
-    .attr('opacity', 0.8);
+    .attr('opacity', opacity)
+    .on("mouseover", function(d) { // change opacity on hovering
+      d3.select(this)
+        .attr("opacity", 1);
+      
+      // create tooltip
+      var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
+      var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+      
+      svg.append("text")
+         .attr("id", "tooltip")
+         .attr("x", xPosition)
+         .attr("y", yPosition)
+         .attr("text-anchor", "middle")
+         .attr("font-family", "sans-serif")
+         .attr("font-size", "11px")
+         .attr("fill", "black")
+         .text(d.RMSE.toFixed(2));
+    })
+    .on("mouseout", function(d) {
+      d3.select(this)
+        .transition()
+        .duration(250)
+        .attr("opacity", opacity);
+        
+      svg.select("#tooltip")
+        .remove();
+    });
 
 // create axis
 var tickLabels = [];
