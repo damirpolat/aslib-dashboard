@@ -3,7 +3,7 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 var axisLine = height / 2;
-var yPadding = 50;
+var yPadding = 100;
 var xPadding = 30;
 
 // create x scale
@@ -40,16 +40,29 @@ svg.selectAll('rect')
     .attr('opacity', 0.8);
 
 // create axis
+var tickLabels = [];
+for(var i = 0; i < data.length; i++) {
+  tickLabels.push(data[i].solver);
+}
+  
 var xAxis = d3.axisBottom()
-              .scale(xScale);
+              .scale(xScale)
+              .tickFormat(function(d, i) {
+                return tickLabels[i];
+              });
 var yAxis = d3.axisLeft()
               .scale(yScale);
               
+
 // draw axis
 svg.append("g")
-   .attr("class", "axis")
+   .attr("class", "x axis")
    .attr("transform", "translate(0," + (height - yPadding) + ")")
-   .call(xAxis);
+   .call(xAxis)
+   .selectAll("text")
+   .attr("transform", "rotate(45)")
+   .style("text-anchor", "start")
+   .attr("font-size", 6);
    
 svg.append("g")
    .attr("class", "axis")
@@ -64,5 +77,7 @@ svg.append("g")
     .attr("y1", yScale(0))
     .attr("y2", yScale(0))
     .attr("x1", xScale(0))
-    .attr("x2", width - yPadding + 5)
+    .attr("x2", width - xPadding)
     .attr("stroke", "black");
+    
+
