@@ -9,6 +9,7 @@ library(scatterD3)
 library(shinyFiles)
 library(plyr)
 library(dplyr)
+library(r2d3)
 source("./helpers.R")
 set.seed(1L)
 

@@ -4,6 +4,7 @@ library(shinyFiles)
 library(shinythemes)
 library(shinydashboard)
 library(DT)
+library(r2d3)
 
 
 # line break
@@ -72,7 +73,7 @@ ui = dashboardPage(
         )
       ),
       tabItem(tabName = "errors",
-        h2("Empty")
+        d3Output("errors")
       )
     )
   )

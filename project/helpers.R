@@ -132,3 +132,12 @@ calculate_errors = function(scenario, data, model) {
     return(val)  
   }))
 }
+
+# create data for error barplot
+build_errors = function(e1, e2) {
+  data = data.frame(matrix(ncol = 2, nrow = length(e1[, 1])))
+  colnames(data) = c("RMSE", "solver")
+  data$RMSE = (e1$RMSE / e2$RMSE) - 1
+  data$solver = e1$solver
+  return(data)
+}
