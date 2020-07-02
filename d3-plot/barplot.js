@@ -19,24 +19,47 @@ var yScale = d3.scaleLinear()
                   d3.max(data, function(d) { return d.RMSE; })])
         .range([height - yPadding - 10, yPadding]);
 
-// create div for tooltip
-var body = d3.select('body')
-	.selectAll('div')
-	.enter()
-	.append('div')
-	.selectAll('p')
-	.enter()
-	.append('p')
-	.text(function(d) {
-	  return "solver: " + d.solver; 
-	 })
-	.attr('class', 'hidden')
-	.style('position','absolute')
-	.style('top', function (d) { return d.top; })
-	.style('left', function (d) { return d.left; })
-	.style('width', width + "px")
-	.style('height', height + "px")
-	.style('background-color', function (d) { return d.backgroundColor; });
+// create tooltip
+d3.select("body")
+      .append("div")
+      .attr("id", "tooltip")
+      .attr("class", "hidden");
+
+// create solver placeholder
+d3.select("#tooltip")
+      .append("p")
+      .attr("id", "header");
+      
+// create value placeholder
+d3.select("#tooltip")
+      .append("p")
+      .attr("id", "value");
+
+// setup style for tooltip
+d3.select("#tooltip")
+  .style("position", "absolute")
+  .style("width", "200px")
+  .style("height", "40px")
+  .style("padding", "10px")
+  .style("background-color", "silver")
+  .style("pointer-events", "none")
+  .style("-webkit-border-radius", "10px")
+  .style("-moz-border-radius", "10px")
+  .style("border-radius", "10px")
+  .style("-webkit-box-shadow", "4px 4px 10px rgba(0, 0, 0, 0.4)")
+  .style("-moz-box-shadow", "4px 4px 10px rgba(0, 0, 0, 0.4")
+  .style("box-shadow", "4px 4px 10px rgba(0, 0, 0, 0.4)");
+
+// make tooltip invisible
+d3.select("#tooltip.hidden")
+  .style("display", "none");
+
+// style for errors
+d3.select("#tooltip")
+  .style("margin", 0)
+  .style("font-family", "sans-serif")
+  .style("font-size", "11px");
+
 
 		
 // adding bars
@@ -65,17 +88,20 @@ svg.selectAll('rect')
       
       // create tooltip
       var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
-      var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+      var yPosition = parseFloat(d3.select(this).attr("y") / + height / 4);
       
-      svg.append("text")
-         .attr("id", "tooltip")
-         .attr("x", xPosition)
-         .attr("y", yPosition)
-         .attr("text-anchor", "middle")
-         .attr("font-family", "sans-serif")
-         .attr("font-size", "11px")
-         .attr("fill", "black")
-         .text(d.RMSE.toFixed(2));
+      //Update the tooltip position and value
+      d3.select("#tooltip")
+        .style("left", xPosition + "px")
+        .style("top", yPosition + "px");            
+      d3.select("#value")
+        .text("error: " + d.RMSE.toFixed(2)); 
+      d3.select("#header")
+        .text("solver: " + d.solver);
+         
+      //Show the tooltip
+      d3.select("#tooltip.hidden")
+        .style("display", "inline");
     })
     .on("mouseout", function(d) {
       d3.select(this)
@@ -83,8 +109,8 @@ svg.selectAll('rect')
         .duration(250)
         .attr("opacity", opacity);
         
-      svg.select("#tooltip")
-        .remove();
+      //Hide the tooltip
+      d3.select("#tooltip.hidden").style("display", "none");
     });
 
 // create axis
