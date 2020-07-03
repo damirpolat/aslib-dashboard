@@ -1,7 +1,7 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 // select body and output it
-var yPadding = 130;
+var yPadding = 150;
 var xPadding = 50;
 var opacity = 0.5;
 
@@ -131,7 +131,7 @@ svg.append("g")
    .selectAll("text")
    .attr("transform", "rotate(45)")
    .style("text-anchor", "start")
-   .attr("font-size", 8);
+   .attr("font-size", 9);
    
 svg.append("g")
    .attr("class", "axis")

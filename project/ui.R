@@ -73,7 +73,7 @@ ui = dashboardPage(
         )
       ),
       tabItem(tabName = "errors",
-        d3Output("errors")
+        d3Output("errors", width = "80%", height = "700px")
       )
     )
   )
