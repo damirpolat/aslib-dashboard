@@ -1,7 +1,7 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 // select body and output it
-var yPadding = 100;
+var yPadding = 130;
 var xPadding = 50;
 var opacity = 0.5;
 
@@ -90,7 +90,7 @@ svg.selectAll('rect')
         .style("left", xPosition + "px")
         .style("top", yPosition + "px")
         .style("opacity", 1)
-        .style("width", (d.solver.length / 2 + 7)  + "em");
+        .style("width", (d.solver.length / 2 + 4)  + "em");
       d3.select("#value")
         .text("error = " + d.RMSE.toFixed(2)); 
       d3.select("#header")
@@ -131,7 +131,7 @@ svg.append("g")
    .selectAll("text")
    .attr("transform", "rotate(45)")
    .style("text-anchor", "start")
-   .attr("font-size", 6);
+   .attr("font-size", 8);
    
 svg.append("g")
    .attr("class", "axis")

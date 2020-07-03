@@ -8,8 +8,6 @@ errors = reactive({ build_errors(errors1(), errors2()) })
 output$errors = renderD3({
   r2d3(
     data = errors(),
-    script = normalizePath("./server/barplot.js"),
-    width = 500,
-    height = 600
+    script = normalizePath("./server/barplot.js")
   )
 })
