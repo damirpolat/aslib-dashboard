@@ -1,8 +1,8 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
-console.log(data.length);
+// select body and output it
 var yPadding = 100;
-var xPadding = 30;
+var xPadding = 50;
 var opacity = 0.5;
 
 // create x scale
@@ -20,8 +20,7 @@ var yScale = d3.scaleLinear()
 // create tooltip
 d3.select("body")
       .append("div")
-      .attr("id", "tooltip")
-      .attr("class", "hidden");
+      .attr("id", "tooltip");
 
 // create solver placeholder
 d3.select("#tooltip")
@@ -38,6 +37,7 @@ d3.select("#tooltip")
   .style("position", "absolute")
   .style("line-height", "0.5em")
   .style("background-color", "white")
+  .style("opacity", 0)
   .style("border", "solid")
   .style("border-width", "1px")
   .style("border-radius", "5px")
@@ -46,15 +46,13 @@ d3.select("#tooltip")
   .style("-moz-box-shadow", "4px 4px 10px rgba(0, 0, 0, 0.4")
   .style("box-shadow", "4px 4px 10px rgba(0, 0, 0, 0.4)");
 
-// make tooltip invisible
-d3.select("#tooltip.hidden")
-  .style("display", "none");
 
 // style for errors
 d3.select("#tooltip")
+  .selectAll("p")
   .style("padding", "0.6em")
   .style("font-family", "sans-serif")
-  .style("font-size", "0.6em")
+  .style("font-size", "0.7em")
   .style("text-anchor", "start");
 
 
@@ -91,15 +89,14 @@ svg.selectAll('rect')
       d3.select("#tooltip")
         .style("left", xPosition + "px")
         .style("top", yPosition + "px")
+        .style("opacity", 1)
         .style("width", (d.solver.length / 2 + 7)  + "em");
       d3.select("#value")
         .text("error = " + d.RMSE.toFixed(2)); 
       d3.select("#header")
         .text("solver = " + d.solver);
          
-      //Show the tooltip
-      d3.select("#tooltip.hidden")
-        .style("display", "inline");
+
     })
     .on("mouseout", function(d) {
       d3.select(this)
@@ -108,7 +105,7 @@ svg.selectAll('rect')
         .attr("opacity", opacity);
         
       //Hide the tooltip
-      d3.select("#tooltip.hidden").style("display", "none");
+      d3.select("#tooltip").style("opacity", 0);
     });
 
 // create axis
