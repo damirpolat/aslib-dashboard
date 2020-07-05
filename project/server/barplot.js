@@ -1,21 +1,22 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 // select body and output it
-var yPadding = 150;
-var xPadding = 50;
+var margin = {top: 70, right: 50, bottom: 130, left: 30};
+var yPadding = 100;
+var xPadding = 30;
 var opacity = 0.5;
 
 // create x scale
 var xScale = d3.scaleBand()
         .domain(d3.range(data.length))
-        .rangeRound([xPadding, width - xPadding - 10])
+        .rangeRound([margin.right, width - margin.left - 10])
         .paddingInner(0.05);
 
 // create y scale
 var yScale = d3.scaleLinear()
         .domain([d3.min(data, function(d) { return d.RMSE; }), 
                   d3.max(data, function(d) { return d.RMSE; })])
-        .range([height - yPadding - 10, yPadding]);
+        .range([height - margin.bottom - 10, margin.top]);
 
 // create tooltip
 d3.select("body")
@@ -49,7 +50,6 @@ d3.select("#tooltip")
 
 // style for errors
 d3.select("#tooltip")
-  .selectAll("p")
   .style("padding", "0.6em")
   .style("font-family", "sans-serif")
   .style("font-size", "0.7em")
@@ -90,7 +90,7 @@ svg.selectAll('rect')
         .style("left", xPosition + "px")
         .style("top", yPosition + "px")
         .style("opacity", 1)
-        .style("width", (d.solver.length / 2 + 4)  + "em");
+        .style("width", (d.solver.length / 2 + 9)  + "em");
       d3.select("#value")
         .text("error = " + d.RMSE.toFixed(2)); 
       d3.select("#header")
@@ -123,19 +123,26 @@ var yAxis = d3.axisLeft()
               .scale(yScale);
               
 
+// gridlines in y axis function
+function make_y_gridlines() {		
+    return d3.axisLeft()
+        .scale(yScale);
+}
+
+
 // draw axis
 svg.append("g")
    .attr("class", "x axis")
-   .attr("transform", "translate(0," + (height - yPadding) + ")")
+   .attr("transform", "translate(0," + (height - margin.bottom) + ")")
    .call(xAxis)
    .selectAll("text")
    .attr("transform", "rotate(45)")
    .style("text-anchor", "start")
-   .attr("font-size", 9);
+   .attr("font-size", 7);
    
 svg.append("g")
    .attr("class", "axis")
-   .attr("transform", "translate(" + xPadding + ",0)")
+   .attr("transform", "translate(" + margin.right + ",0)")
    .call(yAxis);
 
 // add a reference line
@@ -145,6 +152,18 @@ svg.append("g")
     .attr("y1", yScale(0))
     .attr("y2", yScale(0))
     .attr("x1", xScale(0))
-    .attr("x2", width - xPadding)
+    .attr("x2", width - margin.left)
     .attr("stroke", "black");
+
+
+// add the Y gridlines
+svg.append("g")			
+    .attr("class", "grid")
+    .attr("transform", "translate(" + margin.right + ")")
+    .call(make_y_gridlines()
+        .tickSize(-(width - 3 * margin.left)) 
+        .tickFormat("")
+    )
+    .style("stroke-opacity", 0.3)
+    .style("stroke", "lightgrey");
     
