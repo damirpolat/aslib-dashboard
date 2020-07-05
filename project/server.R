@@ -10,6 +10,8 @@ library(shinyFiles)
 library(plyr)
 library(dplyr)
 library(r2d3)
+library(plotly)
+library(htmlwidgets)
 source("./helpers.R")
 set.seed(1L)
 

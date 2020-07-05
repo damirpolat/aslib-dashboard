@@ -73,7 +73,8 @@ ui = dashboardPage(
         )
       ),
       tabItem(tabName = "errors",
-        d3Output("errors", width = "80%", height = "700px")
+        plotlyOutput("errors", width = "80%", height = "700px")
+        #d3Output("errors", width = "80%", height = "700px")
       )
     )
   )

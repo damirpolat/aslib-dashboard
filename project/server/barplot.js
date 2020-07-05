@@ -145,16 +145,6 @@ svg.append("g")
    .attr("transform", "translate(" + margin.right + ",0)")
    .call(yAxis);
 
-// add a reference line
-svg.append("g")
-    .attr("class", "ref line")
-    .append("line")
-    .attr("y1", yScale(0))
-    .attr("y2", yScale(0))
-    .attr("x1", xScale(0))
-    .attr("x2", width - margin.left)
-    .attr("stroke", "black");
-
 
 // add the Y gridlines
 svg.append("g")			
