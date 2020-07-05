@@ -3,6 +3,7 @@ library(scatterD3)
 library(shinyFiles)
 library(shinythemes)
 library(shinydashboard)
+library(plotly)
 library(DT)
 library(r2d3)
 
@@ -73,8 +74,13 @@ ui = dashboardPage(
         )
       ),
       tabItem(tabName = "errors",
-        plotlyOutput("errors", width = "80%", height = "700px")
-        #d3Output("errors", width = "80%", height = "700px")
+        fluidRow(
+          column(width = 10, 
+                 plotlyOutput("errors", width = "100%", height = "700px")),
+          column(width = 2, 
+                 uiOutput("barplot_options")
+                )
+        )
       )
     )
   )
