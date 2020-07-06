@@ -5,7 +5,6 @@ library(shinythemes)
 library(shinydashboard)
 library(plotly)
 library(DT)
-library(r2d3)
 
 
 # line break

@@ -35,6 +35,10 @@ RUN R -e "install.packages('shinydashboard')"
 RUN R -e "install.packages('rJava')"
 RUN R -e "install.packages('devtools')"
 RUN R -e "devtools::install_github('https://github.com/juba/scatterD3')"
+RUN R -e "install.packages('plotly')"
+RUN R -e "install.packages('htmlwidgets')"
+RUN R -e "install.packages('plyr')"
+RUN R -e "install.packages('dplyr')"
 
 # get aslib-r package from GitHub
 RUN git clone --single-branch --branch farff https://github.com/coseal/aslib-r.git home/aslib-r
