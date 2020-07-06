@@ -1,24 +1,2 @@
-fix bug that doesn't let you zoom in/out when only mcp or par is selected. only appeared after I added them both -- done
-refactor code
-let users load their own RData or any other files with algorithm selection results -- done
-let users load their own scenarios -- done
-add virtual best and single best solver statistics to the plot. also add mean mcp and par10 scores for each selector -- done
-bug with not updating title and text for plot -- need to install github version of scatterD3
-add better summary for gaps closed -- done
-add more interesting theme -- done
-change app layout -- don
-maybe switch to dashboard -- done 
-add summary for inputs: name of scenario, selectors, number of instances, mean runtime, etc. -- done
-add summary when all data is loaded -- done
-scatter plot comparison with single best and virtual best solvers -- done
-make summary text appear only after scatter plot shows up -- done
-
-add more visualization options
-add loading animations
 do not reload data or selector if nothing changed
-refactor code
-add footer, look into adminLTE2
-
-modules: module for selecting and loading scenarios; module for selecting learners; module for visualizing that takes outputs 
-of both learner and scenario modules.
-Maybe combine scenarioSource module with scenario module. 
+add a footer, look into adminLTE2
