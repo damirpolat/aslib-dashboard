@@ -1,4 +1,4 @@
-# dash.R
+# app.R
 # Damir Pulatov
 
 library(shiny)

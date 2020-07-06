@@ -78,7 +78,11 @@ ui = dashboardPage(
           column(width = 10, 
                  plotlyOutput("errors", width = "100%", height = "700px")),
           column(width = 2, 
-                 uiOutput("barplot_options")
+                 radioButtons("barplot", label = h3("Ratio Type"), 
+                              choices = list("(selector 1 / selector 2) - 1" = "ratio1",
+                                             "(selector 2 / selector 1) - 1" = "ratio2"),
+                              selected = "ratio1"
+                 )
                 )
         )
       )

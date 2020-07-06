@@ -89,7 +89,7 @@ output$perf_title = renderUI({
 })
   
 
-results = reactiveValues(data = NULL)
+results = reactiveValues(data = NULL, errors = NULL)
 selectors = reactiveValues(learner1 = NULL,
                            learner2 = NULL,
                            file1 = NULL,
