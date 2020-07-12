@@ -1,2 +1,4 @@
 do not reload data or selector if nothing changed
-add a footer, look into adminLTE2
+add a link to repository
+add support for classification in llama
+explore themes
