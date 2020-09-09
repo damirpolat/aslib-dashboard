@@ -18,6 +18,7 @@ ui = dashboardPage(
     sidebarMenu(
       menuItem("Input", tabName = "inputs", icon = icon("file-import")),
       menuItem("Comparison", tabName = "compare", icon = icon("chart-area")),
+      menuItem("Consistency", tabName = "consistency", icon = icon("chart-area")),
       menuItem("Errors", tabName = "errors", icon = icon("chart-bar"))
     )
   ),
@@ -69,6 +70,16 @@ ui = dashboardPage(
             radioButtons("y_axis", label = "y-axis", 
               choices = c("algorithm selector", "single best solver", "virtual best solver"),
               selected = "algorithm selector")
+          )
+        )
+      ),
+      # consistency tab
+      tabItem(tabName = "consistency",
+        fluidRow(
+          column(10, offset = 0, plotlyOutput("plot_consistency", width = "100%", height = "700px")), 
+          column(2,
+                 selectInput("metric", "Select metric", choices = c("mcp", "par10")),
+                 htmlOutput("summary")
           )
         )
       ),

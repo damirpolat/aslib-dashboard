@@ -11,6 +11,7 @@ library(plyr)
 library(dplyr)
 library(plotly)
 library(htmlwidgets)
+library(tidyr)
 source("./helpers.R")
 set.seed(1L)
 

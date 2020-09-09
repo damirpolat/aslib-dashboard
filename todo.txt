@@ -2,3 +2,4 @@ do not reload data or selector if nothing changed
 add a link to repository
 add support for classification in llama
 explore themes
+summarize mcp and par10 consistency across methods
