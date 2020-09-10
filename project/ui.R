@@ -73,16 +73,6 @@ ui = dashboardPage(
           )
         )
       ),
-      # consistency tab
-      tabItem(tabName = "consistency",
-        fluidRow(
-          column(10, offset = 0, plotlyOutput("plot_consistency", width = "100%", height = "700px")), 
-          column(2,
-                 selectInput("metric", "Select metric", choices = c("mcp", "par10")),
-                 htmlOutput("summary")
-          )
-        )
-      ),
       tabItem(tabName = "errors",
         fluidRow(
           column(width = 10, 
