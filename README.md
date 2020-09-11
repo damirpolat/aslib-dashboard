@@ -17,10 +17,14 @@ Hit _Run!_ to start visualizing.
 
 The __Input__ tab will show scenario and algorithm summaries.
 
-The __Comparison__ tab shows an interactive scatter plot that compares the performances of two algorithm selectors.
+__Comparison__ tab shows an interactive scatter plot that compares the performances of two algorithm selectors.
 You can also compare the performance of a selector to single best and virtual best solvers with the help of  
 __x-axis__ and __y-axis__ radio buttons. 
 __Select metric__ lets you specify a metric to compare selectors with (mcp or par10). 
+
+__Consistency__ tab shows boxplots of scores for different algorithm selectors. 
+The idea is to compare the spread of scores between two selectors. 
+You can choose selectors as well as the score metrics in the same was as in __Comparison__ tab. 
 
 __Errors__ tab shows RMSE ratios of two selectors subtracted by one. 
 RMSE errors are computed with respect to true algorithm performance. 
