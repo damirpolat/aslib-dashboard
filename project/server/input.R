@@ -181,7 +181,9 @@ toListenMethod2 = reactive({
 })
 
 names = reactiveValues(selector1_name = NULL,
-                       selector2_name = NULL)
+                       selector2_name = NULL,
+                       selector1_cons = NULL,
+                       selector2_cons = NULL)
 
 observeEvent(toListenX(), {
   if(x_axis() == "algorithm selector") {
@@ -204,6 +206,30 @@ observeEvent(toListenY(), {
     }
   } else {
     names$selector2_name = y_axis()
+  }
+})
+
+observeEvent(toListenMethod1(), {
+  if(method_1() == "algorithm selector") {
+    if(input$selector1_type == "mlr/llama") {
+      names$selector1_cons = selectors$learner1
+    } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
+      names$selector1_cons = selectors$file1$name
+    }
+  } else {
+    names$selector1_cons = method_1()
+  }
+})
+
+observeEvent(toListenMethod2(), {
+  if(method_2() == "algorithm selector") {
+    if(input$selector2_type == "mlr/llama") {
+      names$selector2_cons = selectors$learner2
+    } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
+      names$selector2_cons = selectors$file2$name
+    }
+  } else {
+    names$selector2_cons = method_2()
   }
 })
 

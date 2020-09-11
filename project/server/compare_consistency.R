@@ -33,8 +33,8 @@ observe({
 observe({
   req(cons_metric$m1)
   req(cons_metric$m2)
-  results$box_data = cons_data(ids(), cons_metric$m1, cons_metric$m2, names$selector1_name, 
-                                names$selector2_name)
+  results$box_data = cons_data(ids(), cons_metric$m1, cons_metric$m2, names$selector1_cons, 
+                                names$selector2_cons)
 })
 
 
@@ -55,7 +55,7 @@ output$plot2 = renderPlotly({
   plot = plot %>% animation_opts(frame = 500, transition = 500, redraw = FALSE)
   
   
-  plot = plot %>% layout(title = sprintf("Consistency Between %s and %s", names$selector1_name, names$selector2_name),
+  plot = plot %>% layout(title = sprintf("Consistency Between %s and %s", names$selector1_cons, names$selector2_cons),
                          xaxis = list(title = '<b>Method<b>', tickangle = 45),
                          yaxis = list(title = '<b>Scores<b>'),
                          margin = list(t = 50))
