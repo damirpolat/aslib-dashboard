@@ -73,6 +73,26 @@ ui = dashboardPage(
           )
         )
       ),
+      tabItem(tabName = "consistency", 
+        fluidRow(
+          column(width = 10, 
+                 plotlyOutput("plot2", width = "100%", height = "700px")), 
+          column(2,
+                 selectInput("metric_cons", "Select metric", choices = c("mcp", "par10"))
+          ),
+          linebreak(10),
+          column(width = 1,
+             radioButtons("method_1", label = "method-1", 
+                          choices = c("algorithm selector", "single best solver", "virtual best solver"),
+                          selected = "algorithm selector")
+          ),
+          column(width = 1,
+             radioButtons("method_2", label = "method-2", 
+                          choices = c("algorithm selector", "single best solver", "virtual best solver"),
+                          selected = "algorithm selector")
+          )
+        )
+      ),
       tabItem(tabName = "errors",
         fluidRow(
           column(width = 10, 

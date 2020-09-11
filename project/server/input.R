@@ -7,7 +7,7 @@ shinyDirChoose(
   roots = c(home = '/home/'),
   filetypes = c('', 'txt', 'arff', 'csv')
 )
-  
+
 # dynamic UI for selecting scenarios
 output$scenario_loader = renderUI({
   switch(input$scenario_type,
@@ -18,52 +18,56 @@ output$scenario_loader = renderUI({
                           verbatimTextOutput("scenario_dir", placeholder = TRUE))
   )
 })
-  
+
 # set up default directory for printing
 global = reactiveValues(datapath = getwd())
 scenario_dir = reactive(input$scenario_upload)
 output$scenario_dir = renderText({
   global$datapath
 })
-  
+
 # print updated scenario directory
 observeEvent(ignoreNULL = TRUE,
-  eventExpr = {
-   input$scenario_upload
-  },
-  handlerExpr = {
-   if (!"path" %in% names(scenario_dir())) return()
-   home = normalizePath("/home/")
-   global$datapath =
-     file.path(home, paste(unlist(scenario_dir()$path[-1]), collapse = .Platform$file.sep))
-  }
+             eventExpr = {
+               input$scenario_upload
+             },
+             handlerExpr = {
+               if (!"path" %in% names(scenario_dir())) return()
+               home = normalizePath("/home/")
+               global$datapath =
+                 file.path(home, paste(unlist(scenario_dir()$path[-1]), collapse = .Platform$file.sep))
+             }
 )
-  
+
 # dynamic UI for selecting selectors
 output$selector1_loader = renderUI({
   switch(input$selector1_type,
-    "mlr/llama" = textInput("learner1", label = h4(strong("Type learner name")),
-                           placeholder = "ex. regr.featureless"),
-    "Custom" =  list(
-     fileInput("selector1_upload", label = h4(strong("Upload selector results")),
-               accept = c(".RData", ".rds")))
+         "mlr/llama" = textInput("learner1", label = h4(strong("Type learner name")),
+                                 placeholder = "ex. regr.featureless"),
+         "Custom" =  list(
+           fileInput("selector1_upload", label = h4(strong("Upload selector results")),
+                     accept = c(".RData", ".rds")))
   )
 })
-  
+
 # dynamic UI for selecting selectors
 output$selector2_loader = renderUI({
   switch(input$selector2_type,
-    "mlr/llama" = textInput("learner2", label = h4(strong("Type learner name")),
-                           placeholder = "ex. regr.featureless"),
-    "Custom" =  list(
-     fileInput("selector2_upload", label = h4(strong("Upload selector results")),
-               accept = c(".RData", ".rds")))
+         "mlr/llama" = textInput("learner2", label = h4(strong("Type learner name")),
+                                 placeholder = "ex. regr.featureless"),
+         "Custom" =  list(
+           fileInput("selector2_upload", label = h4(strong("Upload selector results")),
+                     accept = c(".RData", ".rds")))
   )
 })
-  
+
 # x and y axis
 x_axis = reactive(input$x_axis)
 y_axis = reactive(input$y_axis)
+
+# first and second boxplots
+method_1 = reactive(input$method_1)
+method_2 = reactive(input$method_2)
 
 # scenario summary
 output$scenario_summary = renderPrint({
@@ -74,8 +78,8 @@ output$scenario_title = renderUI({
   req(load_scenario())
   h4(strong("Scenario summary"))
 })
-  
-  
+
+
 # algorithm summaries
 output$algo_perf = renderDataTable({
   req(load_scenario())
@@ -87,7 +91,7 @@ output$perf_title = renderUI({
   req(load_scenario())
   h4(strong(paste("Algorithm Summary for", load_scenario()$desc$scenario_id)))
 })
-  
+
 
 results = reactiveValues(data = NULL, errors = NULL, box_data = NULL)
 selectors = reactiveValues(learner1 = NULL,
@@ -112,8 +116,8 @@ observeEvent(input$run, {
   req(input$selector2_upload)
   selectors$file2 = input$selector2_upload
 })
-  
-  
+
+
 # build selectors
 selector1 = reactive({
   if(input$selector1_type == "Custom") {
@@ -130,8 +134,8 @@ selector1 = reactive({
                         data = scenario_data()))
   }
 })
-  
-  
+
+
 selector2 = reactive({
   if(input$selector2_type == "Custom") {
     req(selectors$file2)
@@ -160,6 +164,7 @@ vbs = reactive({
   return(get_vbs(scenario_data()))
 })
 
+# listen to x and y axis choices
 toListenX = reactive({
   list(input$run, x_axis())
 })
@@ -167,8 +172,17 @@ toListenY = reactive({
   list(input$run, y_axis())
 })
 
+# listen to method choices
+toListenMethod1 = reactive({
+  list(input$run, method_1())
+})
+toListenMethod2 = reactive({
+  list(input$run, method_2())
+})
+
 names = reactiveValues(selector1_name = NULL,
                        selector2_name = NULL)
+
 observeEvent(toListenX(), {
   if(x_axis() == "algorithm selector") {
     if(input$selector1_type == "mlr/llama") {
@@ -198,10 +212,11 @@ observeEvent(toListenY(), {
 load_scenario = eventReactive(input$run, {
   read_scenario(input$scenario_type, global$datapath, input$scenario)
 })
-  
+
 # convert data into llama format
 scenario_data = reactive(get_data(load_scenario()))
 ids = reactive(get_ids(scenario_data())) 
 
 # store metric selection
 metric = reactive(input$metric)
+metric_cons = reactive(input$metric_cons)

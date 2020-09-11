@@ -2,10 +2,23 @@
 # Damir Pulatov
 
 library(llama)
+library(tidyr)
 
 # build data for scatter plot
 build_data = function(ids, m1, m2) {
   data = data.frame(instance_id = ids, x = m1, y = m2)
+  return(data)
+}
+
+# build data for box plot
+cons_data = function(ids, m1, m2, name1, name2) {
+  if (name1 == name2) {
+    name1 = sprintf("%s_1", name1)
+    name2 = sprintf("%s_2", name2)
+  }
+  data = data.frame(instance_id = ids, x = m1, y = m2)
+  colnames(data) = c("instance_id", name1, name2)
+  data = gather(data, "method", "value", c(name1, name2))
   return(data)
 }
 

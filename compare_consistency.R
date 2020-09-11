@@ -33,8 +33,11 @@ observe({
 observe({
   req(cons_metric$m1)
   req(cons_metric$m2)
-  results$box_data = cons_data(ids(), cons_metric$m1, cons_metric$m2, names$selector1_name, 
-                                names$selector2_name)
+  results$box_data = build_data(ids(), cons_metric$m1, cons_metric$m2)
+  
+  # need to rename columns and convert to long data
+  #colnames(results$box_data) = c("instance_id", names$selector1_name, names$selector2_name)
+  #results$box_data = gather(results$box_data, "method", "value", c(names$selector1_name, names$selector2_name))
 })
 
 
