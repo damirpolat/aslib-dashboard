@@ -60,7 +60,7 @@ model1_gap = reactive(compute_gap(model1_mean(), virtual_mean(), single_mean()))
 model2_gap = reactive(compute_gap(model2_mean(), virtual_mean(), single_mean()))
 
 
-# build summary for mcp
+# build summary for gaps
 output$summary = renderUI({
   req(results$data)
   summary1 = paste("Percentage gap closed between single best and virtual best solvers:")

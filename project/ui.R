@@ -78,7 +78,8 @@ ui = dashboardPage(
           column(width = 10, 
                  plotlyOutput("plot2", width = "100%", height = "700px")), 
           column(2,
-                 selectInput("metric_cons", "Select metric", choices = c("mcp", "par10"))
+                 selectInput("metric_cons", "Select metric", choices = c("mcp", "par10")),
+                 htmlOutput("summary_var")
           ),
           linebreak(10),
           column(width = 1,

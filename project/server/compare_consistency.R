@@ -38,6 +38,19 @@ observe({
 })
 
 
+# compute coefficient of variation
+model1_cv = reactive(compute_cv(results$box_data, names$selector1_cons, names$selector2_cons))
+model2_cv = reactive(compute_cv(results$box_data, names$selector2_cons, names$selector1_cons))
+
+# build summary for variation
+output$summary_var = renderUI({
+  req(results$box_data)
+  summary1 = paste("Coefficient of variation:")
+  summary2 = paste("<b>", names$selector1_cons, "</b>: ", model1_cv(), "%", sep = "")
+  summary3 = paste("<b>", names$selector2_cons, "</b>: ", model2_cv(), "%", sep = "")
+  HTML(paste(summary1, summary2, summary3, sep = "<br/>"))
+})
+
 output$plot2 = renderPlotly({
   req(results$box_data)
   plot = plot_ly(data = results$box_data, x = ~method, y = ~value, type = "box",

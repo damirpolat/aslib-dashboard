@@ -52,8 +52,18 @@ compute_metric = function(data, method, selector) {
 }
 
 # compute percentage of closed gap
-compute_gap =  function(model_val, vbs_val, sbs_val) {
+compute_gap = function(model_val, vbs_val, sbs_val) {
   return(round(1 - (model_val - vbs_val) / (sbs_val - vbs_val), 2) * 100)
+}
+
+# compute coefficient of variation
+compute_cv = function(data, name1, name2) {
+  if (name1 == name2) {
+    name1 = sprintf("%s_1", name1)
+    name2 = sprintf("%s_2", name2)
+  }
+  vals = data[data$method == name1, ]$value
+  return(round((sd(vals) / mean(vals)) * 100, 2))
 }
 
 
