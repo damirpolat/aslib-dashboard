@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:4.0.0-ubuntu18.04
+FROM rocker/tidyverse:4.0.2
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
@@ -39,6 +39,9 @@ RUN R -e "install.packages('plotly')"
 RUN R -e "install.packages('htmlwidgets')"
 RUN R -e "install.packages('plyr')"
 RUN R -e "install.packages('dplyr')"
+RUN R -e "install.packages('reshape2')"
+RUN R -e "install.packages('Rcpp')"
+RUN R -e "install.packages('mlr', dependencies = TRUE)"
 
 # get aslib-r package from GitHub
 RUN git clone --single-branch --branch farff https://github.com/coseal/aslib-r.git home/aslib-r
