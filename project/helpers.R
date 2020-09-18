@@ -122,7 +122,7 @@ create_model = function(type, learner_name, data) {
   }
   learner = makeImputeWrapper(learner = setHyperPars(makeLearner(learner_mlr)),
                               classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
-                                             factor = imputeConstant("NA"), character = imputeConstant("NA")))
+                              factor = imputeConstant("NA"), character = imputeConstant("NA")))
   
   if (type == "regression") {
     model = regression(learner, data)
