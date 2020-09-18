@@ -13,7 +13,7 @@ output$scenario_loader = renderUI({
   switch(input$scenario_type,
          "ASlib" = textInput("scenario", label = h4(strong("Type ASlib scenario")),
                              placeholder = "ex. SAT11-INDU", value = "SAT11-INDU"),
-         "Custom" =  list(shinyDirButton("scenario_upload", label = "Upload scenario",
+         "custom" =  list(shinyDirButton("scenario_upload", label = "Upload scenario",
                                          "Select directory with scenario"),
                           verbatimTextOutput("scenario_dir", placeholder = TRUE))
   )
@@ -42,9 +42,9 @@ observeEvent(ignoreNULL = TRUE,
 # dynamic UI for selecting selectors
 output$selector1_loader = renderUI({
   switch(input$selector1_type,
-         "mlr/llama" = textInput("learner1", label = h4(strong("Type learner name")),
+         "regression" = textInput("learner1", label = h4(strong("Select learner")),
                                  placeholder = "ex. regr.featureless"),
-         "Custom" =  list(
+         "custom" = list(
            fileInput("selector1_upload", label = h4(strong("Upload selector results")),
                      accept = c(".RData", ".rds")))
   )
@@ -53,9 +53,9 @@ output$selector1_loader = renderUI({
 # dynamic UI for selecting selectors
 output$selector2_loader = renderUI({
   switch(input$selector2_type,
-         "mlr/llama" = textInput("learner2", label = h4(strong("Type learner name")),
+         "regression" = textInput("learner2", label = h4(strong("Select learner")),
                                  placeholder = "ex. regr.featureless"),
-         "Custom" =  list(
+         "custom" =  list(
            fileInput("selector2_upload", label = h4(strong("Upload selector results")),
                      accept = c(".RData", ".rds")))
   )
@@ -120,13 +120,13 @@ observeEvent(input$run, {
 
 # build selectors
 selector1 = reactive({
-  if(input$selector1_type == "Custom") {
+  if(input$selector1_type == "custom") {
     req(selectors$file1)
-    return(create_model(type = "Custom", 
+    return(create_model(type = "custom", 
                         learner_name = NULL, 
                         file_name = selectors$file1,
                         data = NULL))
-  } else if(input$selector1_type == "mlr/llama") {
+  } else if(input$selector1_type == "regression") {
     req(selectors$learner1)
     return(create_model(type = "mlr/llama", 
                         learner_name = selectors$learner1, 
@@ -137,13 +137,13 @@ selector1 = reactive({
 
 
 selector2 = reactive({
-  if(input$selector2_type == "Custom") {
+  if(input$selector2_type == "custom") {
     req(selectors$file2)
-    return(create_model(type = "Custom", 
+    return(create_model(type = "custom", 
                         learner_name = NULL, 
                         file_name = selectors$file2,
                         data = NULL))
-  } else if(input$selector2_type == "mlr/llama") {
+  } else if(input$selector2_type == "regression") {
     req(selectors$learner2)
     return(create_model(type = "mlr/llama", 
                         learner_name = selectors$learner2, 
@@ -187,9 +187,9 @@ names = reactiveValues(selector1_name = NULL,
 
 observeEvent(toListenX(), {
   if(x_axis() == "algorithm selector") {
-    if(input$selector1_type == "mlr/llama") {
+    if(input$selector1_type == "regression") {
       names$selector1_name = selectors$learner1
-    } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
+    } else if(input$selector1_type == "custom" && !is.null(selectors$file1)) {
       names$selector1_name = selectors$file1$name
     }
   } else {
@@ -199,9 +199,9 @@ observeEvent(toListenX(), {
 
 observeEvent(toListenY(), {
   if(y_axis() == "algorithm selector") {
-    if(input$selector2_type == "mlr/llama") {
+    if(input$selector2_type == "regression") {
       names$selector2_name = selectors$learner2
-    } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
+    } else if(input$selector2_type == "custom" && !is.null(selectors$file2)) {
       names$selector2_name = selectors$file2$name
     }
   } else {
@@ -211,9 +211,9 @@ observeEvent(toListenY(), {
 
 observeEvent(toListenMethod1(), {
   if(method_1() == "algorithm selector") {
-    if(input$selector1_type == "mlr/llama") {
+    if(input$selector1_type == "regression") {
       names$selector1_cons = selectors$learner1
-    } else if(input$selector1_type == "Custom" && !is.null(selectors$file1)) {
+    } else if(input$selector1_type == "custom" && !is.null(selectors$file1)) {
       names$selector1_cons = selectors$file1$name
     }
   } else {
@@ -223,9 +223,9 @@ observeEvent(toListenMethod1(), {
 
 observeEvent(toListenMethod2(), {
   if(method_2() == "algorithm selector") {
-    if(input$selector2_type == "mlr/llama") {
+    if(input$selector2_type == "regression") {
       names$selector2_cons = selectors$learner2
-    } else if(input$selector2_type == "Custom" && !is.null(selectors$file2)) {
+    } else if(input$selector2_type == "custom" && !is.null(selectors$file2)) {
       names$selector2_cons = selectors$file2$name
     }
   } else {
