@@ -42,8 +42,10 @@ observeEvent(ignoreNULL = TRUE,
 # dynamic UI for selecting selectors
 output$selector1_loader = renderUI({
   switch(input$selector1_type,
-         "regression" = textInput("learner1", label = h4(strong("Select learner")),
-                                 placeholder = "ex. regr.featureless"),
+         "regression" = selectInput("learner1", label = h4(strong("Select learner by name")), 
+                                    choices = c("featureless", "random forest")),
+         "classification" = selectInput("learner1", label = h4(strong("Select learner by name")), 
+                                    choices = c("featureless", "random forest")),
          "custom" = list(
            fileInput("selector1_upload", label = h4(strong("Upload selector results")),
                      accept = c(".RData", ".rds")))
@@ -53,8 +55,10 @@ output$selector1_loader = renderUI({
 # dynamic UI for selecting selectors
 output$selector2_loader = renderUI({
   switch(input$selector2_type,
-         "regression" = textInput("learner2", label = h4(strong("Select learner")),
-                                 placeholder = "ex. regr.featureless"),
+         "regression" = selectInput("learner2", label = h4(strong("Select learner by name")), 
+                                    choices = c("featureless", "random forest")),
+         "classification" = selectInput("learner2", label = h4(strong("Select learner by name")), 
+                                        choices = c("featureless", "random forest")),
          "custom" =  list(
            fileInput("selector2_upload", label = h4(strong("Upload selector results")),
                      accept = c(".RData", ".rds")))
@@ -122,15 +126,11 @@ observeEvent(input$run, {
 selector1 = reactive({
   if(input$selector1_type == "custom") {
     req(selectors$file1)
-    return(create_model(type = "custom", 
-                        learner_name = NULL, 
-                        file_name = selectors$file1,
-                        data = NULL))
-  } else if(input$selector1_type == "regression") {
+    return(read_model(file_name = selectors$file1))
+  } else {
     req(selectors$learner1)
-    return(create_model(type = "mlr/llama", 
+    return(create_model(type = input$selector1_type, 
                         learner_name = selectors$learner1, 
-                        file_name = NULL,
                         data = scenario_data()))
   }
 })
@@ -139,15 +139,11 @@ selector1 = reactive({
 selector2 = reactive({
   if(input$selector2_type == "custom") {
     req(selectors$file2)
-    return(create_model(type = "custom", 
-                        learner_name = NULL, 
-                        file_name = selectors$file2,
-                        data = NULL))
-  } else if(input$selector2_type == "regression") {
+    return(read_model(file_name = selectors$file2))
+  } else {
     req(selectors$learner2)
-    return(create_model(type = "mlr/llama", 
-                        learner_name = selectors$learner2, 
-                        file_name = NULL,
+    return(create_model(type = input$selector2_type, 
+                        learner_name = selectors$learner2,
                         data = scenario_data()))
   }
 })
@@ -187,7 +183,8 @@ names = reactiveValues(selector1_name = NULL,
 
 observeEvent(toListenX(), {
   if(x_axis() == "algorithm selector") {
-    if(input$selector1_type == "regression") {
+    if(input$selector1_type == "regression" || 
+       input$selector1_type == "classification") {
       names$selector1_name = selectors$learner1
     } else if(input$selector1_type == "custom" && !is.null(selectors$file1)) {
       names$selector1_name = selectors$file1$name
@@ -199,7 +196,8 @@ observeEvent(toListenX(), {
 
 observeEvent(toListenY(), {
   if(y_axis() == "algorithm selector") {
-    if(input$selector2_type == "regression") {
+    if(input$selector2_type == "regression"|| 
+       input$selector2_type == "classification") {
       names$selector2_name = selectors$learner2
     } else if(input$selector2_type == "custom" && !is.null(selectors$file2)) {
       names$selector2_name = selectors$file2$name
@@ -211,7 +209,8 @@ observeEvent(toListenY(), {
 
 observeEvent(toListenMethod1(), {
   if(method_1() == "algorithm selector") {
-    if(input$selector1_type == "regression") {
+    if(input$selector1_type == "regression" || 
+       input$selector1_type == "classification") {
       names$selector1_cons = selectors$learner1
     } else if(input$selector1_type == "custom" && !is.null(selectors$file1)) {
       names$selector1_cons = selectors$file1$name
@@ -223,7 +222,8 @@ observeEvent(toListenMethod1(), {
 
 observeEvent(toListenMethod2(), {
   if(method_2() == "algorithm selector") {
-    if(input$selector2_type == "regression") {
+    if(input$selector2_type == "regression" || 
+       input$selector2_type == "classification") {
       names$selector2_cons = selectors$learner2
     } else if(input$selector2_type == "custom" && !is.null(selectors$file2)) {
       names$selector2_cons = selectors$file2$name
