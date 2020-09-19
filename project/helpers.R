@@ -2,6 +2,7 @@
 # Damir Pulatov
 
 library(tidyr)
+library(stringr)
 
 # list of integrated learners and their mlr names
 regr_list = listLearners("regr", warn.missing.packages = FALSE)
@@ -11,6 +12,10 @@ regr_mlr = regr_list$class[regr_list$installed]
 classif_list = listLearners("classif", warn.missing.packages = FALSE)
 classif_learners = classif_list$name[classif_list$installed]
 classif_mlr = classif_list$class[classif_list$installed]
+
+# list of ASlib scenarios
+short_sc = list.files("../data/aslib_data/", all.files = FALSE)
+short_sc = short_sc[!str_detect(short_sc, "README.md")]
 
 # build data for scatter plot
 build_data = function(ids, m1, m2) {
@@ -78,7 +83,7 @@ compute_cv = function(data, name1, name2) {
 # wrapper for loading scenario
 read_scenario = function(switch, path = NULL, scenario_name = NULL) {
   if(switch == "ASlib") {
-    scenario = getCosealASScenario(scenario_name)
+    scenario = parseASScenario(paste("../data/aslib_data/", scenario_name, sep = ""))
     return(scenario)
   } else if (switch == "Custom") {
     scenario = parseASScenario(path)

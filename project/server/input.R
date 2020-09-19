@@ -11,9 +11,9 @@ shinyDirChoose(
 # dynamic UI for selecting scenarios
 output$scenario_loader = renderUI({
   switch(input$scenario_type,
-         "ASlib" = textInput("scenario", label = h4(strong("Type ASlib scenario")),
-                             placeholder = "ex. SAT11-INDU", value = "SAT11-INDU"),
-         "custom" =  list(shinyDirButton("scenario_upload", label = "Upload scenario",
+         "ASlib" = selectInput("scenario", label = h4(strong("Type ASlib scenario")), 
+                               choices = short_sc), 
+         "Custom" = list(shinyDirButton("scenario_upload", label = "Upload scenario",
                                          "Select directory with scenario"),
                           verbatimTextOutput("scenario_dir", placeholder = TRUE))
   )
