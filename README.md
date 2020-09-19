@@ -8,8 +8,8 @@ In __Input__ tab type ASlib scenario as it appears in [aslib_data](https://githu
 select your own scenario. To upload a custom scenario, select _Custom_ from __Scenario source__. For the custom 
 scenario, you need to specify a directory with all the files. 
 
-For algorithm selectors, you can either type a name of [mlr](https://mlr.mlr-org.com/) learner (right now only _regr._ learners supported) or 
-upload your own algorithm selection results. If you type an mlr learner, dashboard will build an algorithm selector behind the scenes with 10 fold cv, so it might take some.
+For algorithm selectors, you can choose a learner from a list of installed [mlr](https://mlr.mlr-org.com/) learners or 
+upload your own algorithm selection results. If you type an mlr learner, dashboard will build an algorithm selector behind the scenes with 10 fold cv, so it will take some time.
 For custom selection results, select _Custom_ from __Selector source__ and 
 upload .RData file with experimental results. 
 
