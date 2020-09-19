@@ -4,6 +4,7 @@ Interactive web dashboard to help visualize results of algorithm selection exper
 This repository contains another repository with ASlib scenarios. After cloning the repo, run
 
 `git submodule init`
+
 `git submodule update`
 
 Run app.R or build a Docker container.
