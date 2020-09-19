@@ -1,15 +1,16 @@
 # helpers.R
 # Damir Pulatov
 
-library(llama)
 library(tidyr)
 
 # list of integrated learners and their mlr names
-regr_learners = c("featureless", "random forest")
-regr_mlr = c("regr.featureless", "regr.randomForest")
+regr_list = listLearners("regr", warn.missing.packages = FALSE)
+regr_learners = regr_list$name[regr_list$installed]
+regr_mlr = regr_list$class[regr_list$installed]
 
-classif_learners = c("featureless", "random forest")
-classif_mlr = c("classif.featureless", "classif.randomForest")
+classif_list = listLearners("classif", warn.missing.packages = FALSE)
+classif_learners = classif_list$name[classif_list$installed]
+classif_mlr = classif_list$class[classif_list$installed]
 
 # build data for scatter plot
 build_data = function(ids, m1, m2) {

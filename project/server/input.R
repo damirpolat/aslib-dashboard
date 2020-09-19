@@ -43,9 +43,9 @@ observeEvent(ignoreNULL = TRUE,
 output$selector1_loader = renderUI({
   switch(input$selector1_type,
          "regression" = selectInput("learner1", label = h4(strong("Select learner by name")), 
-                                    choices = c("featureless", "random forest")),
+                                    choices = regr_learners),
          "classification" = selectInput("learner1", label = h4(strong("Select learner by name")), 
-                                    choices = c("featureless", "random forest")),
+                                    choices = classif_learners),
          "custom" = list(
            fileInput("selector1_upload", label = h4(strong("Upload selector results")),
                      accept = c(".RData", ".rds")))
@@ -56,9 +56,9 @@ output$selector1_loader = renderUI({
 output$selector2_loader = renderUI({
   switch(input$selector2_type,
          "regression" = selectInput("learner2", label = h4(strong("Select learner by name")), 
-                                    choices = c("featureless", "random forest")),
+                                    choices = regr_learners),
          "classification" = selectInput("learner2", label = h4(strong("Select learner by name")), 
-                                        choices = c("featureless", "random forest")),
+                                        choices = classif_learners),
          "custom" =  list(
            fileInput("selector2_upload", label = h4(strong("Upload selector results")),
                      accept = c(".RData", ".rds")))
