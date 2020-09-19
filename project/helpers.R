@@ -6,10 +6,12 @@ library(stringr)
 
 # list of integrated learners and their mlr names
 regr_list = listLearners("regr", warn.missing.packages = FALSE)
+regr_list = regr_list[!regr_list$package == "llama", ]
 regr_learners = regr_list$name[regr_list$installed]
 regr_mlr = regr_list$class[regr_list$installed]
 
 classif_list = listLearners("classif", warn.missing.packages = FALSE)
+classif_list = classif_list[!classif_list$package == "llama", ]
 classif_learners = classif_list$name[classif_list$installed]
 classif_mlr = classif_list$class[classif_list$installed]
 
