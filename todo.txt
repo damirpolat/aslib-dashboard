@@ -1,7 +1,6 @@
 do not reload data or selector if nothing changed
 add a link to repository
 explore themes
-list scenarios instead of making users typing them
 add loading visualization
 fix bug: error when switching from regression to classification
 add error messages

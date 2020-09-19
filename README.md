@@ -1,11 +1,16 @@
 # ASlib Dashboard
-Interactive web dashboard to help visualize the results of algorithm selection experiments.
+Interactive web dashboard to help visualize results of algorithm selection experiments.
+
+This repository contains another repository with ASlib scenarios. After cloning the repo, run
+
+`git submodule init`
+`git submodule update`
 
 Run app.R or build a Docker container.
 
 # How to use
-In __Input__ tab type ASlib scenario as it appears in [aslib_data](https://github.com/coseal/aslib_data) repository or 
-select your own scenario. To upload a custom scenario, select _Custom_ from __Scenario source__. For the custom 
+In __Input__ tab choose one of the ASlib scenarios from [aslib_data](https://github.com/coseal/aslib_data) or 
+upload your own scenario. To upload a custom scenario, select _Custom_ from __Scenario source__. For the custom 
 scenario, you need to specify a directory with all the files. 
 
 For algorithm selectors, you can choose a learner from a list of installed [mlr](https://mlr.mlr-org.com/) learners or 
