@@ -36,10 +36,10 @@ ui = dashboardPage(
           column(width = 2,
                  selectInput("scenario_type", label = h4(strong("Scenario source")),
                              choices = c("ASlib", "Custom")),
-                 selectInput("selector1_type", label = h4(strong("Selector source")),
-                             choices = c("mlr/llama", "Custom")),
-                 selectInput("selector2_type", label = h4(strong("Selector source")),
-                             choices = c("mlr/llama", "Custom"))
+                 selectInput("selector1_type", label = h4(strong("Selector type")),
+                             choices = c("regression", "classification", "custom")),
+                 selectInput("selector2_type", label = h4(strong("Selector type")),
+                             choices = c("regression", "classification", "custom"))
           )
           ),
           # summary

@@ -1,8 +1,16 @@
 # helpers.R
 # Damir Pulatov
 
-library(llama)
 library(tidyr)
+
+# list of integrated learners and their mlr names
+regr_list = listLearners("regr", warn.missing.packages = FALSE)
+regr_learners = regr_list$name[regr_list$installed]
+regr_mlr = regr_list$class[regr_list$installed]
+
+classif_list = listLearners("classif", warn.missing.packages = FALSE)
+classif_learners = classif_list$name[classif_list$installed]
+classif_mlr = classif_list$class[classif_list$installed]
 
 # build data for scatter plot
 build_data = function(ids, m1, m2) {
@@ -97,25 +105,32 @@ get_data = function(scenario) {
 }
 
 
-# build model with llama with scenario split into train/test
-build_model = function(learner_name, data) {
-  learner = makeImputeWrapper(learner = setHyperPars(makeLearner(learner_name)),
-                classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
-                factor = imputeConstant("NA"), character = imputeConstant("NA")))
-  model = regression(learner, data)
+# read model from file
+read_model = function(file_name) {
+  var_name = load(file_name$datapath) 
+  model = get(var_name)
   return(model)
 }
 
-
-# wrapper for building/uploading model
-# need assert that loaded model has predictions
-create_model = function(type, learner_name, file_name, data) {
-  if(type == "mlr/llama") {
-    model = build_model(learner_name, data)
-  } else if(type == "Custom") {
-    var_name = load(file_name$datapath) 
-    model = get(var_name)
+# build model from scratch
+create_model = function(type, learner_name, data) {
+  if (type == "regression") {
+    ind = match(learner_name, regr_learners)
+    learner_mlr = regr_mlr[ind]
+  } else if (type == "classification") {
+    ind = match(learner_name, classif_learners)
+    learner_mlr = classif_mlr[ind]
   }
+  learner = makeImputeWrapper(learner = setHyperPars(makeLearner(learner_mlr)),
+                              classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
+                              factor = imputeConstant("NA"), character = imputeConstant("NA")))
+  
+  if (type == "regression") {
+    model = regression(learner, data)
+  } else if (type == "classification") {
+    model = classify(learner, data)
+  }
+
   return(model)
 }
 
