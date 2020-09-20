@@ -125,9 +125,12 @@ create_model = function(type, learner_name, data) {
     ind = match(learner_name, regr_learners)
     learner_mlr = regr_mlr[ind]
   } else if (type == "classification") {
+    cat(learner_name)
     ind = match(learner_name, classif_learners)
+    cat(ind)
     learner_mlr = classif_mlr[ind]
   }
+  #cat(learner_mlr)
   learner = makeImputeWrapper(learner = setHyperPars(makeLearner(learner_mlr)),
                               classes = list(numeric = imputeMean(), integer = imputeMean(), logical = imputeMode(),
                               factor = imputeConstant("NA"), character = imputeConstant("NA")))

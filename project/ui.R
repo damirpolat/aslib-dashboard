@@ -1,8 +1,9 @@
 library(shiny)
+library(shinydashboard)
+library(shinyjs)
 library(scatterD3)
 library(shinyFiles)
 library(shinythemes)
-library(shinydashboard)
 library(plotly)
 library(DT)
 
@@ -23,6 +24,7 @@ ui = dashboardPage(
     )
   ),
   dashboardBody(
+    useShinyjs(),
     tabItems(
       # input tab
       tabItem(tabName = "inputs",

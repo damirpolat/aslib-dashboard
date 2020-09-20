@@ -103,26 +103,30 @@ selectors = reactiveValues(learner1 = NULL,
                            file1 = NULL,
                            file2 = NULL)
 # get names of learners
-observeEvent(input$run, {
+#selectors$learner1 = reactive({
+#  eventFilter(input$run, input$learner1)
+#})
+shinyjs::onclick("run", {
   req(input$learner1)
   selectors$learner1 = input$learner1
 })
-observeEvent(input$run, {
+shinyjs::onclick("run", {
   req(input$learner2)
   selectors$learner2 = input$learner2
 })
 
-observeEvent(input$run, {
+shinyjs::onclick("run", {
   req(input$selector1_upload)
   selectors$file1 = input$selector1_upload
 })
-observeEvent(input$run, {
+shinyjs::onclick("run", {
   req(input$selector2_upload)
   selectors$file2 = input$selector2_upload
 })
 
 
 # build selectors
+#observeEvent(input$run, {
 selector1 = reactive({
   if(input$selector1_type == "custom") {
     req(selectors$file1)
@@ -183,8 +187,9 @@ names = reactiveValues(selector1_name = NULL,
 
 observeEvent(toListenX(), {
   if(x_axis() == "algorithm selector") {
-    if(input$selector1_type == "regression" || 
-       input$selector1_type == "classification") {
+    if(input$selector1_type == "regression") {
+      names$selector1_name = selectors$learner1
+    } else if (input$selector1_type == "classification") {
       names$selector1_name = selectors$learner1
     } else if(input$selector1_type == "custom" && !is.null(selectors$file1)) {
       names$selector1_name = selectors$file1$name
