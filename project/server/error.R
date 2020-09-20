@@ -5,8 +5,8 @@
 ratio_type = reactive(input$barplot)
 
 # compute error values
-errors1 = reactive({calculate_errors(load_scenario(), scenario_data(), selector1())})
-errors2 = reactive({calculate_errors(load_scenario(), scenario_data(), selector2())})
+errors1 = reactive({calculate_errors(scenario$load_scenario, scenario_data(), selector1())})
+errors2 = reactive({calculate_errors(scenario$load_scenario, scenario_data(), selector2())})
 
 observe({
   req(errors1())

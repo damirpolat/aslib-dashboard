@@ -84,6 +84,10 @@ compute_cv = function(data, name1, name2) {
 
 # wrapper for loading scenario
 read_scenario = function(switch, path = NULL, scenario_name = NULL) {
+  cat(switch)
+  if (is.null(scenario_name)) {
+    cat("scenario_name is null")
+  }
   if(switch == "ASlib") {
     scenario = parseASScenario(paste("../data/aslib_data/", scenario_name, sep = ""))
     return(scenario)
@@ -106,6 +110,9 @@ make_text = function(metric, selector1, selector2) {
 
 # build data from scenario
 get_data = function(scenario) {
+  if (is.null(scenario)) {
+    cat("scenario is NULL")
+  }
   llama.cv = convertToLlamaCVFolds(scenario)
   data = fixFeckingPresolve(scenario, llama.cv)
   return(data)

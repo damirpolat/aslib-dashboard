@@ -75,25 +75,25 @@ method_2 = reactive(input$method_2)
 
 # scenario summary
 output$scenario_summary = renderPrint({
-  req(load_scenario())
-  print(load_scenario())
+  req(scenario$load_scenario)
+  print(scenario$load_scenario)
 })
 output$scenario_title = renderUI({
-  req(load_scenario())
+  req(scenario$load_scenario)
   h4(strong("Scenario summary"))
 })
 
 
 # algorithm summaries
 output$algo_perf = renderDataTable({
-  req(load_scenario())
-  datatable(summarizeAlgoPerf(load_scenario(), load_scenario()$desc$performance_measures), 
+  req(scenario$load_scenario)
+  datatable(summarizeAlgoPerf(scenario$load_scenario, scenario$load_scenario$desc$performance_measures), 
             height = '70px', options = list(paging = TRUE, pageLength = 8,
                                             lengthMenu = c(8, 16, 24, 32, 40)))
 })
 output$perf_title = renderUI({
-  req(load_scenario())
-  h4(strong(paste("Algorithm Summary for", load_scenario()$desc$scenario_id)))
+  req(scenario$load_scenario)
+  h4(strong(paste("Algorithm Summary for", scenario$load_scenario$desc$scenario_id)))
 })
 
 
@@ -185,7 +185,8 @@ names = reactiveValues(selector1_name = NULL,
                        selector1_cons = NULL,
                        selector2_cons = NULL)
 
-observeEvent(toListenX(), {
+shinyjs::onclick("run", {
+  cat(x_axis())
   if(x_axis() == "algorithm selector") {
     if(input$selector1_type == "regression") {
       names$selector1_name = selectors$learner1
@@ -199,7 +200,7 @@ observeEvent(toListenX(), {
   }
 })
 
-observeEvent(toListenY(), {
+shinyjs::onclick("run", {
   if(y_axis() == "algorithm selector") {
     if(input$selector2_type == "regression"|| 
        input$selector2_type == "classification") {
@@ -212,7 +213,7 @@ observeEvent(toListenY(), {
   }
 })
 
-observeEvent(toListenMethod1(), {
+shinyjs::onclick("run", {
   if(method_1() == "algorithm selector") {
     if(input$selector1_type == "regression" || 
        input$selector1_type == "classification") {
@@ -225,7 +226,7 @@ observeEvent(toListenMethod1(), {
   }
 })
 
-observeEvent(toListenMethod2(), {
+shinyjs::onclick("run", {
   if(method_2() == "algorithm selector") {
     if(input$selector2_type == "regression" || 
        input$selector2_type == "classification") {
@@ -239,13 +240,15 @@ observeEvent(toListenMethod2(), {
 })
 
 
+scenario = reactiveValues(load_scenario = NULL)
 # function to load ASlib scenario
-load_scenario = eventReactive(input$run, {
-  read_scenario(input$scenario_type, global$datapath, input$scenario)
+shinyjs::onclick("run", {
+  scenario$load_scenario = read_scenario(input$scenario_type, global$datapath, input$scenario)
+  cat("run")
 })
 
 # convert data into llama format
-scenario_data = reactive(get_data(load_scenario()))
+scenario_data = reactive(get_data(scenario$load_scenario))
 ids = reactive(get_ids(scenario_data())) 
 
 # store metric selection
