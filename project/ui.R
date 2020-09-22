@@ -3,6 +3,7 @@ library(scatterD3)
 library(shinyFiles)
 library(shinythemes)
 library(shinydashboard)
+library(shinyjs)
 library(plotly)
 library(DT)
 
@@ -23,6 +24,7 @@ ui = dashboardPage(
     )
   ),
   dashboardBody(
+    useShinyjs(),
     tabItems(
       # input tab
       tabItem(tabName = "inputs",
@@ -83,14 +85,14 @@ ui = dashboardPage(
           ),
           linebreak(10),
           column(width = 1,
-             radioButtons("method_1", label = "method-1", 
-                          choices = c("algorithm selector", "single best solver", "virtual best solver"),
-                          selected = "algorithm selector")
+                 radioButtons("method_1", label = "method-1", 
+                              choices = c("algorithm selector", "single best solver", "virtual best solver"),
+                              selected = "algorithm selector")
           ),
           column(width = 1,
-             radioButtons("method_2", label = "method-2", 
-                          choices = c("algorithm selector", "single best solver", "virtual best solver"),
-                          selected = "algorithm selector")
+                 radioButtons("method_2", label = "method-2", 
+                              choices = c("algorithm selector", "single best solver", "virtual best solver"),
+                              selected = "algorithm selector")
           )
         )
       ),
@@ -100,11 +102,11 @@ ui = dashboardPage(
                  plotlyOutput("errors", width = "100%", height = "700px")),
           column(width = 2, 
                  radioButtons("barplot", label = h3("Ratio Type"), 
-                              choices = list("(selector 1 / selector 2) - 1" = "ratio1",
-                                             "(selector 2 / selector 1) - 1" = "ratio2"),
-                              selected = "ratio1"
+                  choices = list("(selector 1 / selector 2) - 1" = "ratio1",
+                                 "(selector 2 / selector 1) - 1" = "ratio2"),
+                  selected = "ratio1"
                  )
-                )
+          )
         )
       )
     )

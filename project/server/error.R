@@ -5,16 +5,19 @@
 ratio_type = reactive(input$barplot)
 
 # compute error values
-errors1 = reactive({calculate_errors(load_scenario(), scenario_data(), selector1())})
-errors2 = reactive({calculate_errors(load_scenario(), scenario_data(), selector2())})
-
+error_list = reactiveValues(errors1 = NULL, errors2 = NULL)
 observe({
-  req(errors1())
-  req(errors2())
+  req(scenarios$scenario)
+  req(scenarios$data)
+  req(selector1())
+  req(selector2())
+  error_list$errors1 = calculate_errors(scenarios$scenario, scenarios$data, selector1())
+  error_list$errors2 = calculate_errors(scenarios$scenario, scenarios$data, selector2())
+  
   if(ratio_type() == "ratio1") {
-    results$errors = build_errors(errors1(), errors2())
+    results$errors = build_errors(error_list$errors1, error_list$errors2)
   } else if(ratio_type() == "ratio2") {
-    results$errors = build_errors(errors2(), errors1())
+    results$errors = build_errors(error_list$errors2, error_list$errors1)
   }
 })
 

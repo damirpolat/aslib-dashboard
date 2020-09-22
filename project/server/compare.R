@@ -9,26 +9,29 @@ lines = reactive({ default_lines })
 # compute metrics of interest
 selector_metric = reactiveValues(m1 = NULL, m2 = NULL)
 observe({
+  req(scenarios$data)
+  req(selector1())
+  req(selector2())
   # calculate metric for each selector
-  if(x_axis() == "algorithm selector") {
-    selector_metric$m1 = compute_metric(data = scenario_data(), 
+  if(input$x_axis == "algorithm selector") {
+    selector_metric$m1 = compute_metric(data = scenarios$data, 
                                         method = metric(), selector = selector1())
-  } else if(x_axis() == "single best solver") {
-    selector_metric$m1 = compute_metric(data = scenario_data(), 
+  } else if(input$x_axis == "single best solver") {
+    selector_metric$m1 = compute_metric(data = scenarios$data, 
                                         method = metric(), selector = sbs())
-  } else if(x_axis() == "virtual best solver") {
-    selector_metric$m1 = compute_metric(data = scenario_data(), 
+  } else if(input$x_axis == "virtual best solver") {
+    selector_metric$m1 = compute_metric(data = scenarios$data, 
                                         method = metric(), selector = vbs())
   }
   
-  if(y_axis() == "algorithm selector") {
-    selector_metric$m2 = compute_metric(data = scenario_data(), 
+  if(input$y_axis == "algorithm selector") {
+    selector_metric$m2 = compute_metric(data = scenarios$data, 
                                         method = metric(), selector = selector2())
-  } else if(y_axis() == "single best solver") {
-    selector_metric$m2 = compute_metric(data = scenario_data(), 
+  } else if(input$y_axis == "single best solver") {
+    selector_metric$m2 = compute_metric(data = scenarios$data, 
                                         method = metric(), selector = sbs())
-  } else if(y_axis() == "virtual best solver") {
-    selector_metric$m2 = compute_metric(data = scenario_data(), 
+  } else if(input$y_axis == "virtual best solver") {
+    selector_metric$m2 = compute_metric(data = scenarios$data, 
                                         method = metric(), selector = vbs())
   }
 })
@@ -37,13 +40,13 @@ observe({
 observe({
   req(selector_metric$m1)
   req(selector_metric$m2)
-  results$data = build_data(ids(), selector_metric$m1, selector_metric$m2)
+  results$data = build_data(scenarios$ids, selector_metric$m1, selector_metric$m2)
 })
 
 # compute mean metric for each model
-single_mean = reactive(mean(compute_metric(data = scenario_data(), 
+single_mean = reactive(mean(compute_metric(data = scenarios$data, 
                       method = metric(), selector = sbs())))
-virtual_mean = reactive(mean(compute_metric(data = scenario_data(), 
+virtual_mean = reactive(mean(compute_metric(data = scenarios$data, 
                       method = metric(), selector = vbs())))
 model1_mean = reactive({
   req(selector_metric$m1)
@@ -70,7 +73,7 @@ output$summary = renderUI({
 })
 
 
-tooltip = reactive(paste("instance_id = ", ids(), "<br>", names$selector1_name, 
+tooltip = reactive(paste("instance_id = ", scenarios$ids, "<br>", names$selector1_name, 
                          " = ", results$data$x, "<br>", names$selector2_name, " = ", results$data$y))
 
 

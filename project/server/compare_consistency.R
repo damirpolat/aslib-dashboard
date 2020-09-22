@@ -4,26 +4,29 @@
 # compute metrics of interest
 cons_metric = reactiveValues(m1 = NULL, m2 = NULL)
 observe({
+  req(scenarios$data)
+  req(selector1())
+  req(selector2())
   # calculate metric for each selector
-  if(method_1() == "algorithm selector") {
-    cons_metric$m1 = compute_metric(data = scenario_data(), 
+  if(input$method_1 == "algorithm selector") {
+    cons_metric$m1 = compute_metric(data = scenarios$data, 
                                         method = metric_cons(), selector = selector1())
-  } else if(method_1() == "single best solver") {
-    cons_metric$m1 = compute_metric(data = scenario_data(), 
+  } else if(input$method_1 == "single best solver") {
+    cons_metric$m1 = compute_metric(data = scenarios$data, 
                                         method = metric_cons(), selector = sbs())
-  } else if(method_1() == "virtual best solver") {
-    cons_metric$m1 = compute_metric(data = scenario_data(), 
+  } else if(input$method_1 == "virtual best solver") {
+    cons_metric$m1 = compute_metric(data = scenarios$data, 
                                         method = metric_cons(), selector = vbs())
   }
   
-  if(method_2() == "algorithm selector") {
-    cons_metric$m2 = compute_metric(data = scenario_data(), 
+  if(input$method_2 == "algorithm selector") {
+    cons_metric$m2 = compute_metric(data = scenarios$data, 
                                         method = metric_cons(), selector = selector2())
-  } else if(method_2() == "single best solver") {
-    cons_metric$m2 = compute_metric(data = scenario_data(), 
+  } else if(input$method_2 == "single best solver") {
+    cons_metric$m2 = compute_metric(data = scenarios$data, 
                                         method = metric_cons(), selector = sbs())
-  } else if(method_2() == "virtual best solver") {
-    cons_metric$m2 = compute_metric(data = scenario_data(), 
+  } else if(input$method_2 == "virtual best solver") {
+    cons_metric$m2 = compute_metric(data = scenarios$data, 
                                         method = metric_cons(), selector = vbs())
   }
 })
@@ -33,7 +36,7 @@ observe({
 observe({
   req(cons_metric$m1)
   req(cons_metric$m2)
-  results$box_data = cons_data(ids(), cons_metric$m1, cons_metric$m2, names$selector1_cons, 
+  results$box_data = cons_data(scenarios$ids, cons_metric$m1, cons_metric$m2, names$selector1_cons, 
                                 names$selector2_cons)
 })
 
